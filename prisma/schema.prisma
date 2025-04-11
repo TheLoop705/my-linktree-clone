@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String        @id @default(uuid())
+  email            String        @unique
+  passwordHash     String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  lastLogin        DateTime?
+  isActive         Boolean       @default(true)
+  isVerified       Boolean       @default(false)
+  authProvider     String?
+  authProviderId   String?
+  resetToken       String?
+  resetTokenExpires DateTime?
+  
+  // Relations
+  profile          UserProfile?
+  pages            LinkPage[]
+  subscription     Subscription?
+}
+
+model UserProfile {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  displayName     String?
+  bio             String?
+  profileImageUrl String?
+  profession      String?
+  location        String?
+  websiteUrl      String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  tier            String
+  status          String
+  startDate       DateTime
+  endDate         DateTime?
+  isAutoRenew     Boolean   @default(false)
+  paymentMethod   String?
+  lastPaymentDate DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LinkPage {
+  id                 String          @id @default(uuid())
+  userId             String
+  slug               String          @unique
+  title              String?
+  description        String?
+  isPublic           Boolean         @default(true)
+  pageMetaTitle      String?
+  pageMetaDescription String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  
+  // Relations
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links              Link[]
+  pageAnalytics      PageAnalytics[]
+  theme              PageTheme?
+}
+
+model Link {
+  id                  String          @id @default(uuid())
+  pageId              String
+  title               String
+  url                 String
+  description         String?
+  icon                String?
+  customThumbnailUrl  String?
+  position            Int             @default(0)
+  isActive            Boolean         @default(true)
+  isFeatured          Boolean         @default(false)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  
+  // Relations
+  page                LinkPage        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  analytics           LinkAnalytics[]
+}
+
+model PageTheme {
+  id                 String    @id @default(uuid())
+  pageId             String    @unique
+  themeName          String?
+  isCustom           Boolean   @default(false)
+  backgroundColor    String?
+  textColor          String?
+  accentColor        String?
+  fontFamily         String?
+  buttonStyle        String?
+  cardStyle          String?
+  backgroundImageUrl String?
+  customCss          String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  
+  // Relations
+  page               LinkPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+model PageAnalytics {
+  id               String    @id @default(uuid())
+  pageId           String
+  visitorIp        String?
+  visitorDevice    String?
+  visitorBrowser   String?
+  visitorOs        String?
+  visitorCountry   String?
+  visitorCity      String?
+  referrer         String?
+  timestamp        DateTime  @default(now())
+  sessionId        String?
+  
+  // Relations
+  page             LinkPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+model LinkAnalytics {
+  id               String    @id @default(uuid())
+  linkId           String
+  sessionId        String?
+  visitorIp        String?
+  visitorDevice    String?
+  visitorBrowser   String?
+  visitorOs        String?
+  visitorCountry   String?
+  visitorCity      String?
+  referrer         String?
+  timestamp        DateTime  @default(now())
+  
+  // Relations
+  link             Link      @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
