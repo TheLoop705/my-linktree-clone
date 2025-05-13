@@ -7,6 +7,7 @@
 #### Authentication & User Management
 
 **US-1: User Registration**
+
 - **As a** new user
 - **I want to** create an account
 - **So that** I can create my personal LinkHub page
@@ -17,6 +18,7 @@
   - User can complete account setup with basic profile info
 
 **US-2: User Login**
+
 - **As a** registered user
 - **I want to** log into my account
 - **So that** I can access my dashboard and manage my links
@@ -27,6 +29,7 @@
   - System provides password recovery option
 
 **US-3: Profile Management**
+
 - **As a** registered user
 - **I want to** update my profile information
 - **So that** my LinkHub page reflects my current information
@@ -39,6 +42,7 @@
 #### Link Management
 
 **US-4: Link Creation**
+
 - **As a** registered user
 - **I want to** add new links to my page
 - **So that** visitors can access my content across platforms
@@ -49,6 +53,7 @@
   - Link is validated for proper format
 
 **US-5: Link Organization**
+
 - **As a** registered user
 - **I want to** organize and prioritize my links
 - **So that** the most important ones are prominently displayed
@@ -59,6 +64,7 @@
   - Changes are saved automatically
 
 **US-6: Link Editing**
+
 - **As a** registered user
 - **I want to** edit existing links
 - **So that** I can update outdated information
@@ -71,6 +77,7 @@
 #### Page Customization
 
 **US-7: Theme Selection**
+
 - **As a** registered user
 - **I want to** select a theme for my page
 - **So that** it matches my personal or brand style
@@ -81,6 +88,7 @@
   - Changes are immediately visible in preview
 
 **US-8: Visual Customization**
+
 - **As a** registered user
 - **I want to** customize the visual elements of my page
 - **So that** it has a unique and personalized look
@@ -91,6 +99,7 @@
   - System provides live preview of changes
 
 **US-9: Advanced Styling**
+
 - **As a** premium user
 - **I want to** access advanced styling options
 - **So that** I can create a completely unique page
@@ -103,6 +112,7 @@
 #### Analytics & Insights
 
 **US-10: View Page Statistics**
+
 - **As a** registered user
 - **I want to** see statistics about my page visitors
 - **So that** I can understand my audience better
@@ -113,6 +123,7 @@
   - Data is presented in easy-to-understand charts
 
 **US-11: Link Performance Tracking**
+
 - **As a** registered user
 - **I want to** track performance of individual links
 - **So that** I can identify which content is most popular
@@ -123,6 +134,7 @@
   - User can export analytics data
 
 **US-12: Conversion Tracking**
+
 - **As a** premium user
 - **I want to** track conversions from my links
 - **So that** I can measure effectiveness of my calls to action
@@ -135,6 +147,7 @@
 #### Sharing & Promotion
 
 **US-13: URL Management**
+
 - **As a** registered user
 - **I want to** have a memorable URL for my page
 - **So that** it's easy for people to find and remember
@@ -145,6 +158,7 @@
   - System prevents inappropriate URL names
 
 **US-14: Social Sharing**
+
 - **As a** registered user
 - **I want to** share my LinkHub page on social media
 - **So that** I can promote my content to followers
@@ -155,6 +169,7 @@
   - System tracks referral sources from shared links
 
 **US-15: QR Code Generation**
+
 - **As a** registered user
 - **I want to** generate a QR code for my page
 - **So that** people can easily access it from printed materials
@@ -348,10 +363,12 @@
 **Primary Actor:** Registered User
 
 **Preconditions:**
+
 - User has registered an account
 - User is logged in
 
 **Main Flow:**
+
 1. User navigates to dashboard
 2. User adds personal information (name, bio, profile image)
 3. User adds links (title, URL, icon)
@@ -360,6 +377,7 @@
 6. User publishes page
 
 **Postcondition:**
+
 - LinkHub page is live and accessible via user's custom URL
 
 #### UC-2: Track Link Performance
@@ -367,10 +385,12 @@
 **Primary Actor:** Registered User
 
 **Preconditions:**
+
 - User has published LinkHub page
 - Page has received visitors
 
 **Main Flow:**
+
 1. User logs into dashboard
 2. User navigates to analytics section
 3. User views overall page statistics
@@ -379,6 +399,7 @@
 6. User optionally exports data
 
 **Postcondition:**
+
 - User has insights about link performance
 
 #### UC-3: Update and Reorganize Links
@@ -386,10 +407,12 @@
 **Primary Actor:** Registered User
 
 **Preconditions:**
+
 - User has existing links on their page
 - User is logged in
 
 **Main Flow:**
+
 1. User logs into dashboard
 2. User edits link details as needed
 3. User drags and drops links to reorder
@@ -398,6 +421,7 @@
 6. Changes are automatically saved
 
 **Postcondition:**
+
 - LinkHub page reflects updated link organization
 
 #### UC-4: Customize Page Appearance
@@ -405,10 +429,12 @@
 **Primary Actor:** Registered User
 
 **Preconditions:**
+
 - User has a LinkHub page
 - User is logged in
 
 **Main Flow:**
+
 1. User navigates to customization section
 2. User selects theme (light/dark)
 3. User customizes colors and fonts
@@ -417,6 +443,7 @@
 6. User saves appearance settings
 
 **Postcondition:**
+
 - LinkHub page displays with customized appearance
 
 #### UC-5: Share and Promote LinkHub Page
@@ -424,10 +451,12 @@
 **Primary Actor:** Registered User
 
 **Preconditions:**
+
 - User has published LinkHub page
 - User is logged in
 
 **Main Flow:**
+
 1. User navigates to share section
 2. User copies custom URL
 3. User shares page directly to social media
@@ -435,5 +464,6 @@
 5. System tracks referral sources for analytics
 
 **Postcondition:**
+
 - User has tools to promote their LinkHub page
 - Analytics capture promotion effectiveness

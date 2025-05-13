@@ -56,7 +56,7 @@ interface User {
 }
 
 // Good
-type UserRole = 'admin' | 'editor' | 'viewer';
+type UserRole = "admin" | "editor" | "viewer";
 
 // Good
 function fetchUser(id: string): Promise<User> {
@@ -79,10 +79,10 @@ function processData(data: any): any {
 
 ```typescript
 // Good
-import { useState, useEffect } from 'react';
-import { Button, Input } from '@/components/ui';
-import { User } from '@/types';
-import { validateEmail } from '../../utils/validation';
+import { useState, useEffect } from "react";
+import { Button, Input } from "@/components/ui";
+import { User } from "@/types";
+import { validateEmail } from "../../utils/validation";
 ```
 
 ### Null Handling
@@ -104,7 +104,7 @@ import { validateEmail } from '../../utils/validation';
 // Good
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, isEditable }) => {
   const { t } = useTranslation();
-  
+
   return (
     <header className="profile-header">
       <ProfileImage src={user.avatarUrl} alt={user.displayName} />
@@ -127,7 +127,7 @@ interface ButtonProps {
   /** The content to display inside the button */
   children: React.ReactNode;
   /** The variant style to apply */
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: "primary" | "secondary" | "ghost";
   /** Whether the button is in a disabled state */
   disabled?: boolean;
   /** Handler called when the button is clicked */
@@ -136,7 +136,7 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = ({
   children,
-  variant = 'primary',
+  variant = "primary",
   disabled = false,
   onClick,
 }) => {
@@ -160,7 +160,7 @@ function useLinks(pageId: string) {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     async function fetchLinks() {
       try {
         setIsLoading(true);
@@ -179,9 +179,9 @@ function useLinks(pageId: string) {
         }
       }
     }
-    
+
     fetchLinks();
-    
+
     return () => {
       isMounted = false;
     };
@@ -211,9 +211,9 @@ function useLinks(pageId: string) {
 // Good component with Tailwind
 const LinkCard: React.FC<LinkCardProps> = ({ title, url }) => {
   return (
-    <a 
+    <a
       href={url}
-      className="block p-4 mb-3 rounded-lg shadow-md bg-white dark:bg-gray-800 
+      className="block p-4 mb-3 rounded-lg shadow-md bg-white dark:bg-gray-800
                  hover:shadow-lg transition-shadow"
       target="_blank"
       rel="noopener noreferrer"
@@ -257,18 +257,18 @@ async function handleSubmit(data: FormData) {
   } catch (error) {
     if (error instanceof ApiError) {
       // Handle specific API errors
-      console.error('API Error:', error.message);
-      return { 
-        success: false, 
-        error: { message: error.message, code: error.code } 
+      console.error("API Error:", error.message);
+      return {
+        success: false,
+        error: { message: error.message, code: error.code },
       };
     }
-    
+
     // Handle unexpected errors
-    console.error('Unexpected error:', error);
-    return { 
-      success: false, 
-      error: { message: 'An unexpected error occurred', code: 'UNKNOWN_ERROR' } 
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      error: { message: "An unexpected error occurred", code: "UNKNOWN_ERROR" },
     };
   }
 }
@@ -299,15 +299,15 @@ describe('LinkCard', () => {
       title: 'My Website',
       url: 'https://example.com',
     };
-    
+
     // Act
     const { getByText } = render(<LinkCard {...props} />);
-    
+
     // Assert
     expect(getByText('My Website')).toBeInTheDocument();
     expect(getByText('https://example.com')).toBeInTheDocument();
   });
-  
+
   it('applies hover styles on mouse over', () => {
     // Test implementation
   });
@@ -338,13 +338,16 @@ describe('LinkCard', () => {
 ```typescript
 /**
  * Authenticates a user with email and password
- * 
+ *
  * @param email - The user's email address
  * @param password - The user's password
  * @returns User data and auth token if successful
  * @throws AuthError if credentials are invalid
  */
-async function loginUser(email: string, password: string): Promise<AuthResponse> {
+async function loginUser(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   // Implementation
 }
 ```

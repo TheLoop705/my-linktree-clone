@@ -6,7 +6,7 @@ In today's digital landscape, individuals and businesses maintain their presence
 
 ### Key Problems
 
-1. **Link Dispersion**: 
+1. **Link Dispersion**:
    Users struggle to efficiently direct their audience to all their online properties, often resulting in lost engagement opportunities. When sharing links across platforms, users are limited to one or two destinations, fragmenting their audience's journey.
 
 2. **Platform Limitations**:
@@ -27,6 +27,7 @@ In today's digital landscape, individuals and businesses maintain their presence
 ### Market Gap
 
 While solutions like LinkTree exist, they present several limitations:
+
 - Restricted customization options
 - Basic functionality on free tiers
 - Limited analytics
@@ -36,6 +37,7 @@ While solutions like LinkTree exist, they present several limitations:
 ### The Opportunity
 
 LinkHub aims to address these challenges by providing a customizable, feature-rich platform that:
+
 - Centralizes a user's digital presence
 - Offers extensive customization while requiring zero technical knowledge
 - Provides actionable analytics

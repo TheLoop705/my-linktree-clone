@@ -8,19 +8,19 @@ This document outlines the technology choices for the LinkHub project, explainin
 
 ## Core Technology Stack
 
-| Category | Technology | Version |
-|----------|------------|---------|
-| Framework | Next.js | 14.x |
-| Language | TypeScript | 5.x |
-| Styling | Tailwind CSS | 3.x |
-| Database | PostgreSQL | 14.x |
-| ORM | Prisma | 5.x |
-| Authentication | NextAuth.js | 4.x |
-| Caching | Redis | 7.x |
-| Testing | Jest, React Testing Library, Cypress | Latest |
-| Deployment | Vercel | - |
-| File Storage | AWS S3 | - |
-| Monitoring | Sentry | - |
+| Category       | Technology                           | Version |
+| -------------- | ------------------------------------ | ------- |
+| Framework      | Next.js                              | 14.x    |
+| Language       | TypeScript                           | 5.x     |
+| Styling        | Tailwind CSS                         | 3.x     |
+| Database       | PostgreSQL                           | 14.x    |
+| ORM            | Prisma                               | 5.x     |
+| Authentication | NextAuth.js                          | 4.x     |
+| Caching        | Redis                                | 7.x     |
+| Testing        | Jest, React Testing Library, Cypress | Latest  |
+| Deployment     | Vercel                               | -       |
+| File Storage   | AWS S3                               | -       |
+| Monitoring     | Sentry                               | -       |
 
 ## Detailed Justifications
 
@@ -29,6 +29,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### Next.js (14.x)
 
 **Justification:**
+
 1. **App Router Architecture**: Next.js's App Router provides a modern, efficient routing system that aligns with our need for complex nested routes in the dashboard.
 2. **Server Components**: The new React Server Components paradigm allows for improved performance by rendering components on the server, reducing client-side JavaScript.
 3. **API Routes**: Built-in API routes simplify our backend architecture and provide a seamless full-stack experience.
@@ -37,6 +38,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Developer Experience**: Hot module replacement and fast refresh improve development efficiency.
 
 **Alternatives Considered:**
+
 - **Create React App**: Lacks server-side rendering and has an uncertain future.
 - **Remix**: Promising but less mature ecosystem and community compared to Next.js.
 - **Gatsby**: More focused on static site generation, less suited for dynamic application features.
@@ -44,6 +46,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### TypeScript (5.x)
 
 **Justification:**
+
 1. **Type Safety**: Provides compile-time type checking, reducing runtime errors.
 2. **Developer Experience**: Enhances code completion, navigation, and refactoring capabilities.
 3. **Documentation**: Types serve as living documentation, making the codebase more maintainable.
@@ -51,12 +54,14 @@ This document outlines the technology choices for the LinkHub project, explainin
 5. **Integration**: Excellent integration with React, Next.js, and modern tooling.
 
 **Alternatives Considered:**
+
 - **JavaScript**: Less safety and tooling support, would require additional runtime validation.
 - **Flow**: Declining industry adoption and community support.
 
 #### Tailwind CSS (3.x)
 
 **Justification:**
+
 1. **Utility-First Approach**: Allows for rapid UI development with consistent design patterns.
 2. **Performance**: Optimized for production with automatic unused CSS removal.
 3. **Customization**: Easily adaptable to our design system through configuration.
@@ -65,6 +70,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Community**: Large community and extensive documentation.
 
 **Alternatives Considered:**
+
 - **CSS Modules**: Less efficient for rapid development and component-focused styling.
 - **Styled Components**: Adds runtime overhead and potential performance implications.
 - **Material UI/Chakra UI**: More opinionated, would require more customization to achieve our design goals.
@@ -74,6 +80,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### PostgreSQL (14.x)
 
 **Justification:**
+
 1. **Relational Structure**: Our data model has clear relationships (users to pages, pages to links) that benefit from a relational database.
 2. **Data Integrity**: Strong ACID compliance ensures reliable data operations.
 3. **Performance**: Excellent performance characteristics for our read-heavy workloads.
@@ -82,6 +89,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Scalability**: Capable of scaling to millions of users with proper optimization.
 
 **Alternatives Considered:**
+
 - **MySQL**: Similar capabilities but PostgreSQL offers better JSON handling and modern features.
 - **MongoDB**: Would require rethinking our relational data model.
 - **Firebase**: Would introduce vendor lock-in and less control over data operations.
@@ -89,6 +97,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### Prisma (5.x)
 
 **Justification:**
+
 1. **Type Safety**: Generated TypeScript types ensure consistency between database and application code.
 2. **Developer Experience**: Intuitive API and excellent tooling improve productivity.
 3. **Migration Management**: Built-in migration system for safe schema evolution.
@@ -96,6 +105,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 5. **Integration**: Works seamlessly with TypeScript and Next.js.
 
 **Alternatives Considered:**
+
 - **TypeORM**: Less mature tooling and sometimes unpredictable query generation.
 - **Sequelize**: Lacks strong TypeScript support compared to Prisma.
 - **Drizzle ORM**: Promising but newer with a smaller community.
@@ -104,6 +114,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### Redis (7.x)
 
 **Justification:**
+
 1. **Caching**: High-performance caching for frequently accessed data.
 2. **Session Storage**: Efficient storage for user sessions.
 3. **Rate Limiting**: Supports implementation of API rate limiting.
@@ -112,6 +123,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Scalability**: Can be clustered for higher throughput.
 
 **Alternatives Considered:**
+
 - **Memcached**: Less feature-rich compared to Redis.
 - **DynamoDB DAX**: Would introduce AWS lock-in.
 - **In-memory application caching**: Would not scale across instances.
@@ -121,6 +133,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### NextAuth.js (4.x)
 
 **Justification:**
+
 1. **Flexibility**: Supports multiple authentication providers (email/password, social logins).
 2. **Integration**: Seamless integration with Next.js and its API routes.
 3. **Security**: Industry-standard security practices out of the box.
@@ -129,6 +142,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Community**: Active community and ongoing maintenance.
 
 **Alternatives Considered:**
+
 - **Custom Auth Solution**: Would require more development time and security expertise.
 - **Firebase Auth**: Would introduce vendor lock-in.
 - **Auth0**: Excellent but introduces additional costs for premium features.
@@ -139,6 +153,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### AWS S3
 
 **Justification:**
+
 1. **Scalability**: Virtually unlimited storage capacity.
 2. **Durability**: 99.999999999% (11 9's) durability for critical user assets.
 3. **Performance**: Global CDN integration via CloudFront.
@@ -147,6 +162,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Integration**: Well-documented SDKs and libraries for Node.js.
 
 **Alternatives Considered:**
+
 - **Google Cloud Storage**: Similar capabilities but less widespread adoption.
 - **Azure Blob Storage**: Similar capabilities but potentially less ecosystem integration.
 - **Cloudinary**: Great for image optimization but higher costs for our use case.
@@ -157,6 +173,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### Vercel
 
 **Justification:**
+
 1. **Next.js Integration**: Purpose-built for Next.js applications.
 2. **Preview Deployments**: Automatic preview deployments for PRs.
 3. **Edge Network**: Global CDN for fast content delivery.
@@ -166,6 +183,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 7. **Scalability**: Automatic scaling based on traffic.
 
 **Alternatives Considered:**
+
 - **Netlify**: Great platform but less optimized for Next.js.
 - **AWS Amplify**: More complex configuration for similar benefits.
 - **Self-hosted Solutions**: Would require significant DevOps expertise and maintenance.
@@ -176,6 +194,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 #### Sentry
 
 **Justification:**
+
 1. **Real-time Error Tracking**: Immediate notification of production issues.
 2. **Session Replay**: Ability to visualize user interactions leading to errors.
 3. **Performance Monitoring**: Identifies bottlenecks in application performance.
@@ -184,6 +203,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Issue Management**: Workflow tools for prioritizing and assigning issues.
 
 **Alternatives Considered:**
+
 - **LogRocket**: Good alternative but higher cost at scale.
 - **Datadog**: More comprehensive but complex and costly for our initial needs.
 - **New Relic**: Enterprise-focused with steep learning curve.
@@ -194,6 +214,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 ### Jest & React Testing Library
 
 **Justification:**
+
 1. **Industry Standard**: Widely adopted testing tools with extensive documentation.
 2. **Component Testing**: React Testing Library's focus on testing behavior rather than implementation.
 3. **Mocking Capabilities**: Jest's powerful mocking system for testing isolated components.
@@ -202,12 +223,14 @@ This document outlines the technology choices for the LinkHub project, explainin
 6. **Developer Experience**: Watch mode for development and clear error messages.
 
 **Alternatives Considered:**
+
 - **Vitest**: Faster but less mature ecosystem.
 - **Mocha/Chai**: More configuration required for similar functionality.
 
 ### Cypress
 
 **Justification:**
+
 1. **End-to-End Testing**: Comprehensive browser-based testing.
 2. **Visual Testing**: Time-travel debugging with snapshots.
 3. **Network Stubbing**: Ability to mock API responses for consistent tests.
@@ -215,6 +238,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 5. **Developer Experience**: Interactive test runner and clear documentation.
 
 **Alternatives Considered:**
+
 - **Playwright**: Strong contender with multi-browser support but less mature ecosystem.
 - **Selenium**: More complex setup and slower execution.
 - **TestCafe**: Good alternative but less community support.
@@ -224,6 +248,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 ### ESLint & Prettier
 
 **Justification:**
+
 1. **Code Quality**: Enforces consistent coding standards.
 2. **Error Prevention**: Catches common errors and anti-patterns.
 3. **Integration**: Works with TypeScript, React, and Next.js.
@@ -232,6 +257,7 @@ This document outlines the technology choices for the LinkHub project, explainin
 ### Husky & lint-staged
 
 **Justification:**
+
 1. **Pre-commit Hooks**: Ensures code quality checks before commit.
 2. **Consistency**: Maintains codebase standards across the team.
 3. **Performance**: Only lints files that are staged for commit.

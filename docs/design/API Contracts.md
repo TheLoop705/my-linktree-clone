@@ -3,6 +3,7 @@
 This document outlines the API contracts for the LinkHub application in OpenAPI 3.0 format. These contracts define the interfaces between frontend and backend components, ensuring consistent communication across the system.
 
 ## API Design Principles
+
 - RESTful design patterns
 - JWT authentication
 - Consistent error handling
@@ -10,28 +11,36 @@ This document outlines the API contracts for the LinkHub application in OpenAPI 
 - Comprehensive documentation
 
 ## Base URL
+
 All API endpoints are prefixed with:
+
 ```
 https://api.linkhub.app/v1
 ```
 
 ## Authentication
+
 Most endpoints require authentication via JWT token passed in the Authorization header:
+
 ```
 Authorization: Bearer {token}
 ```
 
 ## Error Responses
+
 All endpoints follow a standard error response format:
+
 ```json
 {
   "status": "error",
   "code": 400,
   "message": "Validation error",
-  "errors": [{
-    "field": "email",
-    "message": "Invalid email format"
-  }]
+  "errors": [
+    {
+      "field": "email",
+      "message": "Invalid email format"
+    }
+  ]
 }
 ```
 
@@ -1584,6 +1593,7 @@ paths:
 ## API Client Integration
 
 A Postman collection of these API endpoints is available for download at:
+
 ```
 https://api.linkhub.app/docs/postman-collection.json
 ```
@@ -1591,11 +1601,13 @@ https://api.linkhub.app/docs/postman-collection.json
 ## Authentication Flow
 
 1. **Registration Flow**:
+
    - `POST /auth/register` to create an account
    - Server sends verification email
    - `GET /auth/verify-email/{token}` to verify email
 
 2. **Login Flow**:
+
    - `POST /auth/login` with credentials
    - Receive JWT token
    - Include token in Authorization header for subsequent requests
@@ -1609,6 +1621,7 @@ https://api.linkhub.app/docs/postman-collection.json
 ## Rate Limiting
 
 All API endpoints are subject to rate limiting:
+
 - 100 requests per minute for authenticated users
 - 20 requests per minute for unauthenticated users
 - 5 requests per minute for sensitive endpoints (login, register)
@@ -1616,6 +1629,7 @@ All API endpoints are subject to rate limiting:
 ## Versioning Strategy
 
 The API follows a versioning strategy to ensure backward compatibility:
+
 - Major version changes in URL path (`/v1`, `/v2`)
 - Minor version changes in request header (`X-API-Version: 1.2`)
 - Deprecation notices with sunset dates
@@ -1623,6 +1637,7 @@ The API follows a versioning strategy to ensure backward compatibility:
 ## API Documentation
 
 Interactive Swagger documentation is available at:
+
 ```
 https://api.linkhub.app/docs
 ```

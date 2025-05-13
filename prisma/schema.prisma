@@ -16,6 +16,8 @@ model User {
   lastLogin        DateTime?
   isActive         Boolean       @default(true)
   isVerified       Boolean       @default(false)
+  emailVerificationToken String? @unique // Added for email verification
+  emailVerificationTokenExpires DateTime? // Added for email verification token expiry
   authProvider     String?
   authProviderId   String?
   resetToken       String?
@@ -74,9 +76,10 @@ model LinkPage {
   
   // Relations
   user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  links              Link[]
+  links              Link[]          // This might be deprecated or refactored in favor of PageComponent of type LINK
   pageAnalytics      PageAnalytics[]
   theme              PageTheme?
+  components         PageComponent[] // Relation to the new PageComponent model
 }
 
 model Link {
@@ -150,4 +153,37 @@ model LinkAnalytics {
   
   // Relations
   link             Link      @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+// New Enum for Page Component Types
+enum ComponentType {
+  TEXT
+  IMAGE
+  VIDEO
+  ICON
+  LINK
+  HEADER
+  BUTTON
+  SOCIALS // For a list of social media links/icons
+  SPACER
+  DIVIDER
+  EMBED   // For embedding external content like YouTube, Spotify, Twitter posts
+}
+
+// New Model for Page Components (Widgets)
+model PageComponent {
+  id          String        @id @default(uuid())
+  pageId      String
+  linkPage    LinkPage      @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type        ComponentType
+  order       Int           // To determine the rendering order on the page
+  content     Json          // Flexible JSON to store component-specific data
+                          // e.g., for TEXT: { "textValue": "Hello", "alignment": "center", "fontSize": "16px" }
+                          // e.g., for IMAGE: { "src": "url", "alt": "description", "width": "100%" }
+                          // e.g., for LINK: { "title": "My Site", "url": "https://...", "icon": "some-icon" }
+  styles      Json?         // Optional: Component-specific styling overrides (e.g., colors, fonts, padding, margins)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([pageId, order]) // Index for efficient querying of components for a page in order
 }

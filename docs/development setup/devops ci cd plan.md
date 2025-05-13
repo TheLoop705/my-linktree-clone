@@ -5,6 +5,7 @@
 LinkHub will be deployed using a modern cloud infrastructure with the following core components:
 
 ### Production Environment
+
 - **Frontend Hosting**: Vercel (Next.js optimized)
 - **Database**: PostgreSQL on a managed service (e.g., AWS RDS, Vercel Postgres)
 - **Caching**: Redis on a managed service (e.g., Upstash, AWS ElastiCache)
@@ -12,6 +13,7 @@ LinkHub will be deployed using a modern cloud infrastructure with the following 
 - **CDN**: Vercel Edge Network for static content delivery
 
 ### Development/Staging Environment
+
 - **Frontend**: Vercel Preview Deployments
 - **Database**: Development instance of PostgreSQL
 - **Caching**: Development instance of Redis
@@ -22,19 +24,23 @@ LinkHub will be deployed using a modern cloud infrastructure with the following 
 ### GitHub Actions Workflow
 
 #### Continuous Integration (`.github/workflows/ci.yml`)
+
 Triggered on pull requests to `main` and `development` branches:
 
 1. **Static Analysis**:
+
    - Lint code with ESLint
    - Format verification with Prettier
    - Type checking with TypeScript
 
 2. **Testing**:
+
    - Run unit tests with Jest
    - Run component tests with React Testing Library
    - Run API tests
 
 3. **Build**:
+
    - Verify the build process
    - Generate production assets
 
@@ -42,17 +48,21 @@ Triggered on pull requests to `main` and `development` branches:
    - Run accessibility checks
 
 #### Continuous Deployment (`.github/workflows/deploy.yml`)
+
 Triggered on push to `main` branch:
 
 1. **Build**:
+
    - Build production assets
    - Run optimizations
 
 2. **Database Migrations**:
+
    - Run Prisma migrations on staging database
    - Verify database schema integrity
 
 3. **Deployment**:
+
    - Deploy to Vercel production environment
    - Run post-deployment verification tests
 
@@ -61,6 +71,7 @@ Triggered on push to `main` branch:
    - Set up alerts for any issues
 
 ### Preview Deployments
+
 - Every PR will generate a unique preview deployment
 - Database migrations will run against an isolated preview database
 - Automated comment on PR with preview link and deployment status
@@ -68,11 +79,13 @@ Triggered on push to `main` branch:
 ## 3. Environment Management
 
 ### Environment Variables
+
 - Stored securely in Vercel and GitHub Secrets
 - Different values for development, staging, and production
 - Local development uses `.env.local` (never committed to repo)
 
 ### Configuration Structure:
+
 ```
 # Next.js
 NEXT_PUBLIC_API_URL=
@@ -111,8 +124,9 @@ SENTRY_DSN=
 ### Docker Configuration
 
 **Development Docker Compose (docker-compose.yml)**:
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   postgres:
     image: postgres:14
@@ -138,6 +152,7 @@ volumes:
 ```
 
 ### Vercel Configuration (vercel.json)
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -171,16 +186,19 @@ volumes:
 ## 5. Monitoring & Observability
 
 ### Application Monitoring
+
 - **Error Tracking**: Sentry for real-time error monitoring
 - **Performance**: Vercel Analytics for performance metrics
 - **Uptime**: UptimeRobot for service availability monitoring
 
 ### Logging
+
 - **Application Logs**: Structured logging with Winston
 - **API Logs**: Request/response logging with middleware
 - **Database Logs**: Query performance monitoring
 
 ### Alerts
+
 - Critical error alerts via email and Slack
 - Performance degradation alerts
 - Security incident alerts
@@ -188,11 +206,13 @@ volumes:
 ## 6. Backup & Disaster Recovery
 
 ### Database Backups
+
 - Automated daily backups of production database
 - Retention policy: 7 daily, 4 weekly, 3 monthly backups
 - Backup testing with periodic restoration verification
 
 ### Disaster Recovery Plan
+
 - **RTO (Recovery Time Objective)**: 2 hours
 - **RPO (Recovery Point Objective)**: 24 hours
 - Documented recovery procedures for different failure scenarios
@@ -200,12 +220,14 @@ volumes:
 ## 7. Security Measures
 
 ### Application Security
+
 - **Auth**: JWT tokens with short expiration
 - **Data Protection**: HTTPS-only, secure cookies
 - **Input Validation**: Server-side validation of all inputs
 - **Rate Limiting**: API rate limiting to prevent abuse
 
 ### Infrastructure Security
+
 - **Secrets Management**: No hardcoded secrets, all stored in secure vaults
 - **Access Control**: Principle of least privilege for all services
 - **Network Security**: Proper firewall and access rules
@@ -214,6 +236,7 @@ volumes:
 ## 8. Deployment Strategy
 
 ### Release Process
+
 1. Development in feature branches
 2. PR to `development` branch triggers CI checks
 3. Merge to `development` deploys to staging
@@ -222,6 +245,7 @@ volumes:
 6. Merge to `main` triggers production deployment
 
 ### Rollback Plan
+
 - One-click rollback option in Vercel
 - Database migration rollbacks with Prisma
 - Documented manual rollback procedures
@@ -229,17 +253,20 @@ volumes:
 ## 9. Infrastructure Scaling Plan
 
 ### Initial Setup (MVP)
+
 - Standard Vercel deployment
 - Basic PostgreSQL and Redis instances
 - Suitable for up to ~10,000 users
 
 ### Mid-scale (Growth Phase)
+
 - Upgraded database with read replicas
 - Enhanced Redis caching
 - CDN optimizations
 - Suitable for up to ~100,000 users
 
 ### Large-scale (Maturity Phase)
+
 - Multi-region deployment
 - Database sharding if necessary
 - Enhanced analytics processing
@@ -248,6 +275,7 @@ volumes:
 ## 10. DevOps Tools & Stack
 
 ### Core Tools
+
 - **Version Control**: GitHub
 - **CI/CD**: GitHub Actions
 - **Infrastructure**: Vercel, AWS
@@ -256,6 +284,7 @@ volumes:
 - **Monitoring**: Sentry, Vercel Analytics
 
 ### Development Tools
+
 - **Local Environment**: Docker Compose
 - **Code Quality**: ESLint, Prettier, Husky
 - **Testing**: Jest, React Testing Library, Cypress

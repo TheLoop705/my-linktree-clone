@@ -8,7 +8,7 @@ This project charter formally authorizes the development of LinkHub, a modern Li
 
 **Document Date:** April 10, 2025  
 **Project Start Date:** April 15, 2025  
-**Target Completion Date:** July 15, 2025 (MVP)  
+**Target Completion Date:** July 15, 2025 (MVP)
 
 ### Project Purpose
 
@@ -21,6 +21,7 @@ To become the preferred link management platform for digital creators and busine
 ### Project Description
 
 LinkHub is a web application built with NextJS and Tailwind CSS that allows users to:
+
 - Create personalized pages hosting multiple links to their online content
 - Customize the appearance and layout of their link pages
 - Track visitor engagement and link click-through rates
@@ -41,6 +42,7 @@ The market for link management platforms has expanded significantly with the gro
 ### Project Scope
 
 #### In Scope
+
 - User registration and authentication system
 - Link creation, editing, and management interface
 - Theme customization (including light/dark mode)
@@ -50,6 +52,7 @@ The market for link management platforms has expanded significantly with the gro
 - Social sharing capabilities
 
 #### Out of Scope
+
 - Content hosting beyond links
 - E-commerce integration (initial phase)
 - Custom domain support (planned for future phase)
@@ -74,29 +77,30 @@ The market for link management platforms has expanded significantly with the gro
 
 ### Key Stakeholders
 
-| Role | Name | Responsibility |
-|------|------|----------------|
-| Project Sponsor | [Sponsor Name] | Ultimate authority and provider of resources |
-| Project Manager | [PM Name] | Day-to-day management and coordination |
-| Lead Developer | [Lead Dev Name] | Technical architecture and development oversight |
-| UX/UI Designer | [Designer Name] | User experience and interface design |
-| Marketing Lead | [Marketing Name] | User acquisition strategy and implementation |
-| QA Lead | [QA Name] | Quality assurance and testing |
+| Role            | Name             | Responsibility                                   |
+| --------------- | ---------------- | ------------------------------------------------ |
+| Project Sponsor | [Sponsor Name]   | Ultimate authority and provider of resources     |
+| Project Manager | [PM Name]        | Day-to-day management and coordination           |
+| Lead Developer  | [Lead Dev Name]  | Technical architecture and development oversight |
+| UX/UI Designer  | [Designer Name]  | User experience and interface design             |
+| Marketing Lead  | [Marketing Name] | User acquisition strategy and implementation     |
+| QA Lead         | [QA Name]        | Quality assurance and testing                    |
 
 ### High-Level Timeline
 
-| Phase | Description | Timeline |
-|-------|-------------|----------|
-| Inception | Requirements gathering, project planning | 2 weeks |
-| Design | UX/UI design, technical architecture | 3 weeks |
-| Development | MVP functionality implementation | 6 weeks |
-| Testing | Quality assurance and user acceptance testing | 2 weeks |
-| Launch | Production deployment and initial marketing | 1 week |
-| Post-Launch | Monitoring, bug fixes, initial feedback collection | 2 weeks |
+| Phase       | Description                                        | Timeline |
+| ----------- | -------------------------------------------------- | -------- |
+| Inception   | Requirements gathering, project planning           | 2 weeks  |
+| Design      | UX/UI design, technical architecture               | 3 weeks  |
+| Development | MVP functionality implementation                   | 6 weeks  |
+| Testing     | Quality assurance and user acceptance testing      | 2 weeks  |
+| Launch      | Production deployment and initial marketing        | 1 week   |
+| Post-Launch | Monitoring, bug fixes, initial feedback collection | 2 weeks  |
 
 ### Resources and Budget
 
 #### Team Resources
+
 - 1 Project Manager (part-time)
 - 2 Full-stack Developers (full-time)
 - 1 UX/UI Designer (part-time)
@@ -104,6 +108,7 @@ The market for link management platforms has expanded significantly with the gro
 - 1 Marketing Specialist (part-time)
 
 #### Technology Resources
+
 - Development environment and tools
 - Hosting infrastructure (Vercel)
 - Database services
@@ -111,6 +116,7 @@ The market for link management platforms has expanded significantly with the gro
 - Design software
 
 #### Budget Allocation
+
 - Development: 65%
 - Design: 15%
 - Marketing: 10%
@@ -120,30 +126,32 @@ The market for link management platforms has expanded significantly with the gro
 ### Constraints and Assumptions
 
 #### Constraints
+
 - Limited initial budget requiring efficient resource utilization
 - Technical constraints of chosen technology stack
 - Market competition requiring timely launch
 
 #### Assumptions
+
 - Team members possess required technical skills
 - Infrastructure will support anticipated initial user load
 - Target market will respond positively to proposed feature set
 
 ### Risks and Mitigation
 
-| Risk | Impact | Probability | Mitigation Strategy |
-|------|--------|------------|---------------------|
-| Development delays | High | Medium | Agile approach with regular checkpoints |
-| Technical challenges | Medium | Medium | Technical spike solutions, outside expertise |
-| Low user adoption | High | Low | Early user testing, focus on core value proposition |
-| Competitive pressure | Medium | Medium | Market differentiation, unique feature development |
+| Risk                 | Impact | Probability | Mitigation Strategy                                 |
+| -------------------- | ------ | ----------- | --------------------------------------------------- |
+| Development delays   | High   | Medium      | Agile approach with regular checkpoints             |
+| Technical challenges | Medium | Medium      | Technical spike solutions, outside expertise        |
+| Low user adoption    | High   | Low         | Early user testing, focus on core value proposition |
+| Competitive pressure | Medium | Medium      | Market differentiation, unique feature development  |
 
 ### Approval
 
 This Project Charter has been reviewed and approved by:
 
-- Project Sponsor: ________________________ Date: __________
-- Project Manager: ________________________ Date: __________
-- Lead Developer: _________________________ Date: __________
+- Project Sponsor: **********\_\_\_\_********** Date: ****\_\_****
+- Project Manager: **********\_\_\_\_********** Date: ****\_\_****
+- Lead Developer: ************\_************ Date: ****\_\_****
 
 By signing above, the project is authorized to proceed as described in this charter.

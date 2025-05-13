@@ -33,6 +33,13 @@
 │  LinkAnalytics │     │   PageTheme    │◄───────────┘
 │                │     │                │
 └────────────────┘     └────────────────┘
+        │
+        ▼
+┌────────────────┐
+│                │
+│  PageComponent │
+│                │
+└────────────────┘
 ```
 
 ## Schema Definitions
@@ -40,6 +47,7 @@
 ### Users and Authentication
 
 #### User
+
 ```sql
 CREATE TABLE "User" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -50,6 +58,8 @@ CREATE TABLE "User" (
     last_login TIMESTAMP WITH TIME ZONE,
     is_active BOOLEAN DEFAULT TRUE,
     is_verified BOOLEAN DEFAULT FALSE,
+    email_verification_token VARCHAR(255) UNIQUE, -- Added for email verification
+    email_verification_token_expires TIMESTAMP WITH TIME ZONE, -- Added for email verification token expiry
     auth_provider VARCHAR(50),
     auth_provider_id VARCHAR(255),
     reset_token VARCHAR(255),
@@ -58,6 +68,7 @@ CREATE TABLE "User" (
 ```
 
 #### UserProfile
+
 ```sql
 CREATE TABLE "UserProfile" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -75,6 +86,7 @@ CREATE TABLE "UserProfile" (
 ```
 
 #### Subscription
+
 ```sql
 CREATE TABLE "Subscription" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -95,6 +107,7 @@ CREATE TABLE "Subscription" (
 ### Link Management
 
 #### LinkPage
+
 ```sql
 CREATE TABLE "LinkPage" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -112,6 +125,7 @@ CREATE TABLE "LinkPage" (
 ```
 
 #### Link
+
 ```sql
 CREATE TABLE "Link" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -130,9 +144,42 @@ CREATE TABLE "Link" (
 );
 ```
 
+#### PageComponent (New Table)
+
+```sql
+CREATE TYPE "ComponentType" AS ENUM (
+  'TEXT',
+  'IMAGE',
+  'VIDEO',
+  'ICON',
+  'LINK',
+  'HEADER',
+  'BUTTON',
+  'SOCIALS',
+  'SPACER',
+  'DIVIDER',
+  'EMBED'
+);
+
+CREATE TABLE "PageComponent" (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    page_id UUID NOT NULL REFERENCES "LinkPage"(id) ON DELETE CASCADE,
+    type "ComponentType" NOT NULL,
+    "order" INTEGER NOT NULL,
+    content JSONB NOT NULL,
+    styles JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_page_component_page FOREIGN KEY (page_id) REFERENCES "LinkPage"(id)
+);
+
+CREATE INDEX idx_pagecomponent_page_order ON "PageComponent"(page_id, "order");
+```
+
 ### Themes and Customization
 
 #### PageTheme
+
 ```sql
 CREATE TABLE "PageTheme" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -156,6 +203,7 @@ CREATE TABLE "PageTheme" (
 ### Analytics
 
 #### PageAnalytics
+
 ```sql
 CREATE TABLE "PageAnalytics" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -174,6 +222,7 @@ CREATE TABLE "PageAnalytics" (
 ```
 
 #### LinkAnalytics
+
 ```sql
 CREATE TABLE "LinkAnalytics" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -218,7 +267,9 @@ model User {
   authProviderId   String?
   resetToken       String?
   resetTokenExpires DateTime?
-  
+  emailVerificationToken String? @unique
+  emailVerificationTokenExpires DateTime?
+
   // Relations
   profile          UserProfile?
   pages            LinkPage[]
@@ -236,7 +287,7 @@ model UserProfile {
   websiteUrl      String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  
+
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -253,7 +304,7 @@ model Subscription {
   lastPaymentDate DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  
+
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -269,12 +320,13 @@ model LinkPage {
   pageMetaDescription String?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
-  
+
   // Relations
   user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   links              Link[]
   pageAnalytics      PageAnalytics[]
   theme              PageTheme?
+  components         PageComponent[] // Added relation
 }
 
 model Link {
@@ -290,10 +342,38 @@ model Link {
   isFeatured          Boolean         @default(false)
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
-  
+
   // Relations
   page                LinkPage        @relation(fields: [pageId], references: [id], onDelete: Cascade)
   analytics           LinkAnalytics[]
+}
+
+enum ComponentType {
+  TEXT
+  IMAGE
+  VIDEO
+  ICON
+  LINK
+  HEADER
+  BUTTON
+  SOCIALS
+  SPACER
+  DIVIDER
+  EMBED
+}
+
+model PageComponent {
+  id          String        @id @default(uuid())
+  pageId      String
+  linkPage    LinkPage      @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type        ComponentType
+  order       Int
+  content     Json
+  styles      Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([pageId, order])
 }
 
 model PageTheme {
@@ -311,7 +391,7 @@ model PageTheme {
   customCss          String?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
-  
+
   // Relations
   page               LinkPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
 }
@@ -328,7 +408,7 @@ model PageAnalytics {
   referrer         String?
   timestamp        DateTime  @default(now())
   sessionId        String?
-  
+
   // Relations
   page             LinkPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
 }
@@ -345,7 +425,7 @@ model LinkAnalytics {
   visitorCity      String?
   referrer         String?
   timestamp        DateTime  @default(now())
-  
+
   // Relations
   link             Link      @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
@@ -372,30 +452,43 @@ CREATE INDEX idx_link_analytics_link_id ON "LinkAnalytics"(link_id);
 -- Optimize subscription lookups
 CREATE INDEX idx_subscription_user_id ON "Subscription"(user_id);
 CREATE INDEX idx_subscription_status ON "Subscription"(status);
+
+-- Optimize PageComponent ordering and lookup
+CREATE INDEX idx_pagecomponent_page_order ON "PageComponent"(page_id, "order");
 ```
 
 ## Key Relationships
 
 1. **User to UserProfile**: One-to-One relationship
+
    - Each user has exactly one profile
 
 2. **User to LinkPage**: One-to-Many relationship
+
    - A user can have multiple link pages (basic users may be limited to one)
 
 3. **LinkPage to Link**: One-to-Many relationship
+
    - Each link page contains multiple links
 
 4. **LinkPage to PageTheme**: One-to-One relationship
+
    - Each link page has one theme configuration
 
 5. **LinkPage to PageAnalytics**: One-to-Many relationship
+
    - Each page view generates an analytics entry
 
 6. **Link to LinkAnalytics**: One-to-Many relationship
+
    - Each link click generates an analytics entry
 
 7. **User to Subscription**: One-to-One relationship
+
    - Each user can have one active subscription
+
+8. \*\*LinkPage to PageComponent: One-to-Many relationship (New)
+   - Each link page can have multiple page components (widgets)
 
 ## Data Migration Considerations
 
