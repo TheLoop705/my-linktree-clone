@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { PageComponent } from '@/types/pageComponents'; // Import the PageComponent type
+import React from "react";
+import { PageComponent } from "@/types/pageComponents"; // Import the PageComponent type
 
 interface PropertiesInspectorPanelProps {
   selectedComponent: PageComponent | null; // Use the PageComponent type
@@ -42,7 +42,7 @@ const PropertiesInspectorPanel: React.FC<PropertiesInspectorPanelProps> = ({
       console.error("Invalid JSON styles", err);
     }
   };
-  
+
   // Handler for changes in the order input
   const handleOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newOrder = parseInt(e.target.value, 10);
@@ -54,46 +54,56 @@ const PropertiesInspectorPanel: React.FC<PropertiesInspectorPanelProps> = ({
   return (
     <div className="p-4">
       <h3 className="text-lg font-semibold text-gray-700 mb-3">
-        Edit: {selectedComponent.type || 'Component'} (ID: {selectedComponent.id})
+        Edit: {selectedComponent.type || "Component"} (ID:{" "}
+        {selectedComponent.id})
       </h3>
       <div className="space-y-4">
         <div>
-          <label htmlFor="componentOrder" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="componentOrder"
+            className="block text-sm font-medium text-gray-700"
+          >
             Order
           </label>
           <input
             type="number"
             id="componentOrder"
             name="order"
-            value={selectedComponent.order ?? ''} // Use selectedComponent.order
+            value={selectedComponent.order ?? ""} // Use selectedComponent.order
             onChange={handleOrderChange} // Use defined handler
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
 
         <div>
-          <label htmlFor="componentContent" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="componentContent"
+            className="block text-sm font-medium text-gray-700"
+          >
             Content (JSON)
           </label>
           <textarea
             id="componentContent"
             name="content"
             rows={6}
-            value={JSON.stringify(selectedComponent.content, null, 2) ?? ''} // Use selectedComponent.content
+            value={JSON.stringify(selectedComponent.content, null, 2) ?? ""} // Use selectedComponent.content
             onChange={handleContentChange} // Use defined handler
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono"
           />
         </div>
 
         <div>
-          <label htmlFor="componentStyles" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="componentStyles"
+            className="block text-sm font-medium text-gray-700"
+          >
             Styles (JSON)
           </label>
           <textarea
             id="componentStyles"
             name="styles"
             rows={6}
-            value={JSON.stringify(selectedComponent.styles, null, 2) ?? ''} // Use selectedComponent.styles
+            value={JSON.stringify(selectedComponent.styles, null, 2) ?? ""} // Use selectedComponent.styles
             onChange={handleStylesChange} // Use defined handler
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono"
           />

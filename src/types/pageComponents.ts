@@ -1,5 +1,5 @@
-import { ComponentType } from '@prisma/client'; // Assuming ComponentType enum is available
-import { JsonValue } from '@prisma/client/runtime/library'; // Or a more specific type if you have one for JSON
+import { ComponentType } from "@prisma/client"; // Assuming ComponentType enum is available
+import { JsonValue } from "@prisma/client/runtime/library"; // Or a more specific type if you have one for JSON
 
 // Defines the structure for a PageComponent on the frontend
 export interface PageComponent {
@@ -18,7 +18,7 @@ export interface PageComponent {
 
 export interface TextComponentContent {
   textValue: string;
-  alignment?: 'left' | 'center' | 'right';
+  alignment?: "left" | "center" | "right";
 }
 
 export interface ImageComponentContent {
@@ -53,6 +53,6 @@ export interface ComponentStyles {
   backgroundColor?: string;
   textColor?: string;
   fontSize?: string;
-  fontWeight?: 'normal' | 'bold' | 'semibold';
+  fontWeight?: "normal" | "bold" | "semibold";
   // ... other common style properties
 }

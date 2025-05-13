@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { ComponentType } from '@prisma/client'; // Assuming ComponentType enum is available
+import React from "react";
+import { ComponentType } from "@prisma/client"; // Assuming ComponentType enum is available
 
 interface ComponentLibraryPanelProps {
   onSelectComponentType: (type: ComponentType) => void;
@@ -10,12 +10,33 @@ interface ComponentLibraryPanelProps {
 
 // Placeholder for available component types
 // In a real app, this might come from a configuration or be dynamically generated
-const availableComponentTypes: { type: ComponentType; name: string; description: string; icon?: string }[] = [
-  { type: ComponentType.TEXT, name: 'Text Block', description: 'Add paragraphs of text.' },
-  { type: ComponentType.LINK, name: 'Link Button', description: 'Add a customizable link button.' },
-  { type: ComponentType.IMAGE, name: 'Image', description: 'Upload and display an image.' },
-  { type: ComponentType.VIDEO, name: 'Video', description: 'Embed a video.' },
-  { type: ComponentType.SOCIALS, name: 'Social Icons', description: 'Display social media profile links.' },
+const availableComponentTypes: {
+  type: ComponentType;
+  name: string;
+  description: string;
+  icon?: string;
+}[] = [
+  {
+    type: ComponentType.TEXT,
+    name: "Text Block",
+    description: "Add paragraphs of text.",
+  },
+  {
+    type: ComponentType.LINK,
+    name: "Link Button",
+    description: "Add a customizable link button.",
+  },
+  {
+    type: ComponentType.IMAGE,
+    name: "Image",
+    description: "Upload and display an image.",
+  },
+  { type: ComponentType.VIDEO, name: "Video", description: "Embed a video." },
+  {
+    type: ComponentType.SOCIALS,
+    name: "Social Icons",
+    description: "Display social media profile links.",
+  },
   // Add more component types as they are developed
 ];
 
@@ -24,7 +45,9 @@ const ComponentLibraryPanel: React.FC<ComponentLibraryPanelProps> = ({
 }) => {
   return (
     <div className="p-2">
-      <h3 className="text-lg font-semibold text-gray-700 mb-3">Component Library</h3>
+      <h3 className="text-lg font-semibold text-gray-700 mb-3">
+        Component Library
+      </h3>
       <div className="space-y-2">
         {availableComponentTypes.map((comp) => (
           <button

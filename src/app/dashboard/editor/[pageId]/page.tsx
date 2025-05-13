@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import PageComponentCanvas from '@/app/components/editor/PageComponentCanvas';
-import ComponentLibraryPanel from '@/app/components/editor/ComponentLibraryPanel';
-import PropertiesInspectorPanel from '@/app/components/editor/PropertiesInspectorPanel';
-import { PageComponent, TextComponentContent } from '@/types/pageComponents'; // Import the new types
-import { ComponentType } from '@prisma/client';
+import React, { useState, useEffect } from "react";
+import PageComponentCanvas from "@/app/components/editor/PageComponentCanvas";
+import ComponentLibraryPanel from "@/app/components/editor/ComponentLibraryPanel";
+import PropertiesInspectorPanel from "@/app/components/editor/PropertiesInspectorPanel";
+import { PageComponent, TextComponentContent } from "@/types/pageComponents"; // Import the new types
+import { ComponentType } from "@prisma/client";
 
 interface PageEditorProps {
   params: {
@@ -16,22 +16,22 @@ interface PageEditorProps {
 // Mock data for initial setup
 const mockComponents: PageComponent[] = [
   {
-    id: 'comp1',
-    pageId: 'mockPage',
+    id: "comp1",
+    pageId: "mockPage",
     type: ComponentType.TEXT,
     order: 1,
-    content: { textValue: 'Welcome to your page!' } as TextComponentContent,
-    styles: { textAlign: 'center', fontSize: '24px' },
+    content: { textValue: "Welcome to your page!" } as TextComponentContent,
+    styles: { textAlign: "center", fontSize: "24px" },
     createdAt: new Date(),
     updatedAt: new Date(),
   },
   {
-    id: 'comp2',
-    pageId: 'mockPage',
+    id: "comp2",
+    pageId: "mockPage",
     type: ComponentType.LINK,
     order: 2,
-    content: { displayText: 'My Portfolio', url: 'https://example.com' },
-    styles: { backgroundColor: '#007bff', textColor: '#ffffff' },
+    content: { displayText: "My Portfolio", url: "https://example.com" },
+    styles: { backgroundColor: "#007bff", textColor: "#ffffff" },
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -40,13 +40,14 @@ const mockComponents: PageComponent[] = [
 export default function PageEditor({ params }: PageEditorProps) {
   const { pageId } = params;
   const [components, setComponents] = useState<PageComponent[]>([]);
-  const [selectedComponent, setSelectedComponent] = useState<PageComponent | null>(null);
+  const [selectedComponent, setSelectedComponent] =
+    useState<PageComponent | null>(null);
 
   useEffect(() => {
     // TODO: Replace with actual API call to fetch components for pageId
     console.log(`Fetching components for page: ${pageId}`);
     // Simulate API call
-    setComponents(mockComponents.map(c => ({...c, pageId }))); // Assign current pageId to mock components
+    setComponents(mockComponents.map((c) => ({ ...c, pageId }))); // Assign current pageId to mock components
   }, [pageId]);
 
   return (
@@ -68,7 +69,11 @@ export default function PageEditor({ params }: PageEditorProps) {
       <div className="flex flex-1 overflow-hidden">
         {/* Component Library Panel (Left Sidebar) */}
         <aside className="w-1/4 bg-gray-100 p-4 overflow-y-auto shadow">
-          <ComponentLibraryPanel onSelectComponentType={(type) => console.log("Add component:", type)} />
+          <ComponentLibraryPanel
+            onSelectComponentType={(type) =>
+              console.log("Add component:", type)
+            }
+          />
         </aside>
 
         {/* Page Component Canvas (Main Area) */}
@@ -88,7 +93,11 @@ export default function PageEditor({ params }: PageEditorProps) {
               console.log("Update component:", updatedData);
               // TODO: Implement actual update logic (API call and local state update)
               if (selectedComponent) {
-                setComponents(prev => prev.map(c => c.id === selectedComponent.id ? {...c, ...updatedData} : c));
+                setComponents((prev) =>
+                  prev.map((c) =>
+                    c.id === selectedComponent.id ? { ...c, ...updatedData } : c
+                  )
+                );
                 setSelectedComponent(null); // Deselect after update or keep selected based on UX preference
               }
             }}
