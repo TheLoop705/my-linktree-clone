@@ -6,13 +6,25 @@ import bcrypt from "bcryptjs";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+
+    // Log the incoming request for debugging
+    console.log("Registration attempt:", {
+      email: body.email,
+      hasPassword: !!body.password,
+    });
+
     const validation = registerSchema.safeParse(body);
 
     if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      console.log("Validation errors:", errors);
+
       return NextResponse.json(
         {
-          message: "Invalid input",
-          errors: validation.error.flatten().fieldErrors,
+          message: "Please fix the following errors",
+          errors: errors,
+          details:
+            "Make sure your password has at least 8 characters, includes uppercase and lowercase letters, and contains at least one number.",
         },
         { status: 400 }
       );

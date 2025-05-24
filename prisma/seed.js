@@ -4,8 +4,8 @@ const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create a test user
-  const hashedPassword = await bcrypt.hash("password123", 12);
+  // Create a test user with a password that meets the validation requirements
+  const hashedPassword = await bcrypt.hash("TestPassword123", 12);
 
   const testUser = await prisma.user.upsert({
     where: { email: "test@example.com" },
@@ -42,7 +42,6 @@ async function main() {
   });
 
   console.log("Created test page:", testPage);
-
   // Create some test links
   const testLinks = await Promise.all([
     prisma.link.upsert({
@@ -54,7 +53,7 @@ async function main() {
         url: "https://example.com/portfolio",
         description: "Check out my latest work",
         isActive: true,
-        order: 1,
+        position: 1,
         pageId: testPage.id,
       },
     }),
@@ -67,7 +66,7 @@ async function main() {
         url: "https://github.com/testuser",
         description: "My open source projects",
         isActive: true,
-        order: 2,
+        position: 2,
         pageId: testPage.id,
       },
     }),
@@ -80,19 +79,18 @@ async function main() {
         url: "https://linkedin.com/in/testuser",
         description: "Professional network",
         isActive: true,
-        order: 3,
+        position: 3,
         pageId: testPage.id,
       },
     }),
   ]);
 
   console.log("Created test links:", testLinks.length);
-
   console.log("Seed data created successfully!");
   console.log("You can now login with:");
   console.log("Email: test@example.com");
-  console.log("Password: password123");
-  console.log("Public page: http://localhost:3000/testuser");
+  console.log("Password: TestPassword123");
+  console.log("Public page: http://localhost:3001/testuser");
 }
 
 main()

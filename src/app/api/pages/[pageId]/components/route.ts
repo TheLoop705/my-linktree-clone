@@ -1,92 +1,96 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/db/prisma";
-import { createPageComponentSchema } from "@/lib/schemas/pageComponent";
-import { Prisma } from "@prisma/client";
-import { ZodError } from "zod";
+import { ComponentType } from "@/types/pageComponents";
 
-export async function POST(
-  request: Request,
+// GET /api/pages/[pageId]/components
+export async function GET(
+  request: NextRequest,
   { params }: { params: { pageId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
     const { pageId } = params;
-    if (!pageId) {
-      return NextResponse.json(
-        { message: "Page ID is required" },
-        { status: 400 }
-      );
-    }
 
-    // Verify user owns the LinkPage
-    const linkPage = await prisma.linkPage.findUnique({
-      where: { id: pageId, userId: session.user.id },
-    });
-
-    if (!linkPage) {
-      return NextResponse.json(
-        { message: "Page not found or access denied" },
-        { status: 404 }
-      );
-    }
-
-    const body = await request.json();
-    const validation = createPageComponentSchema.safeParse({ ...body, pageId });
-
-    if (!validation.success) {
-      return NextResponse.json(
-        {
-          message: "Invalid input",
-          errors: validation.error.flatten().fieldErrors,
-        },
-        { status: 400 }
-      );
-    }
-
-    const { type, content, styles } = validation.data;
-    let { order } = validation.data;
-
-    // Determine the order for the new component
-    // If order is not provided or is negative, place it at the end
-    if (order === undefined || order < 0) {
-      const maxOrderComponent = await prisma.pageComponent.findFirst({
-        where: { pageId },
-        orderBy: { order: "desc" },
-      });
-      order = maxOrderComponent ? maxOrderComponent.order + 1 : 0;
-    } else {
-      // If an order is specified, we might need to shift other components
-      // For MVP, let's assume client manages this or we handle it more simply.
-      // For now, if order is specified, we use it. A more robust solution would handle conflicts.
-    }
-
-    const newPageComponent = await prisma.pageComponent.create({
-      data: {
-        pageId,
-        type,
-        order,
-        content: content as Prisma.JsonObject, // Cast because content is z.any()
-        styles: styles as Prisma.JsonObject | undefined, // Cast because styles is z.any()
+    // Verify user owns this page
+    const page = await prisma.linkPage.findFirst({
+      where: {
+        id: pageId,
+        userId: session.user.id,
       },
     });
 
-    return NextResponse.json(newPageComponent, { status: 201 });
-  } catch (error) {
-    console.error("[PAGE_COMPONENTS_POST_ERROR]", error);
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        { message: "Validation failed", errors: error.errors },
-        { status: 400 }
-      );
+    if (!page) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
     }
+
+    // Fetch components ordered by their order field
+    const components = await prisma.pageComponent.findMany({
+      where: { pageId },
+      orderBy: { order: "asc" },
+    });
+
+    return NextResponse.json(components);
+  } catch (error) {
+    console.error("Error fetching page components:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/pages/[pageId]/components
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { pageId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { pageId } = params;
+    const body = await request.json();
+
+    // Verify user owns this page
+    const page = await prisma.linkPage.findFirst({
+      where: {
+        id: pageId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!page) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
+
+    // Get the next order number
+    const lastComponent = await prisma.pageComponent.findFirst({
+      where: { pageId },
+      orderBy: { order: "desc" },
+    });
+
+    const nextOrder = (lastComponent?.order ?? 0) + 1; // Create new component
+    const component = await prisma.pageComponent.create({
+      data: {
+        pageId,
+        type: body.type as ComponentType,
+        order: nextOrder,
+        content: JSON.stringify(body.content || {}),
+        styles: body.styles ? JSON.stringify(body.styles) : null,
+      },
+    });
+
+    return NextResponse.json(component, { status: 201 });
+  } catch (error) {
+    console.error("Error creating page component:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

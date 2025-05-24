@@ -22,13 +22,16 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string[] }>(
+    {}
+  );
   const router = useRouter();
   const { toast } = useToast();
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
+    setFieldErrors({});
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -55,7 +58,15 @@ export default function RegisterPage() {
         });
         router.push("/login");
       } else {
-        setError(data.message || "Registration failed");
+        // Handle field-specific errors
+        if (data.errors) {
+          setFieldErrors(data.errors);
+          const errorMessages = Object.values(data.errors).flat().join(", ");
+          setError(data.message || "Please fix the validation errors");
+        } else {
+          setError(data.message || "Registration failed");
+        }
+
         toast({
           title: "Registration Failed",
           description: data.message || "Registration failed",
@@ -65,6 +76,7 @@ export default function RegisterPage() {
     } catch (err) {
       console.error("Registration error", err);
       setError("An unexpected error occurred");
+      setFieldErrors({});
       toast({
         title: "Registration Error",
         description: "An unexpected error occurred.",
@@ -88,6 +100,7 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {" "}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -100,7 +113,15 @@ export default function RegisterPage() {
                 }
                 required
                 disabled={isLoading}
+                className={fieldErrors.email ? "border-red-500" : ""}
               />
+              {fieldErrors.email && (
+                <div className="text-sm text-red-500">
+                  {fieldErrors.email.map((error, index) => (
+                    <div key={index}>{error}</div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -113,7 +134,21 @@ export default function RegisterPage() {
                 }
                 required
                 disabled={isLoading}
+                className={fieldErrors.password ? "border-red-500" : ""}
               />
+              {fieldErrors.password && (
+                <div className="text-sm text-red-500">
+                  {fieldErrors.password.map((error, index) => (
+                    <div key={index}>{error}</div>
+                  ))}
+                </div>
+              )}
+              {!fieldErrors.password && (
+                <div className="text-xs text-gray-500">
+                  Password must be at least 8 characters with uppercase,
+                  lowercase, and numbers
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
