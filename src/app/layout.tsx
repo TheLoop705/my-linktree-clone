@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import SessionProviderWrapper from "./components/auth/SessionProviderWrapper"; // Import the wrapper
-import { Toaster } from "~/components/ui/sonner"; // Changed path to ~/
+import SessionProviderWrapper from "@/components/providers/SessionProviderWrapper";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,14 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <SessionProviderWrapper>
-          {" "}
-          {/* Wrap children with SessionProviderWrapper */}
+    <html lang="en">      <body className={inter.className}>
+        <SessionProvider>
           {children}
-          <Toaster /> {/* Add Toaster for notifications */}
-        </SessionProviderWrapper>
+          <Toaster />
+        </SessionProvider>
       </body>
     </html>
   );

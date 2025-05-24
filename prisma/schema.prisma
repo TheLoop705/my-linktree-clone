@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -155,35 +155,20 @@ model LinkAnalytics {
   link             Link      @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
 
-// New Enum for Page Component Types
-enum ComponentType {
-  TEXT
-  IMAGE
-  VIDEO
-  ICON
-  LINK
-  HEADER
-  BUTTON
-  SOCIALS // For a list of social media links/icons
-  SPACER
-  DIVIDER
-  EMBED   // For embedding external content like YouTube, Spotify, Twitter posts
-}
-
 // New Model for Page Components (Widgets)
 model PageComponent {
-  id          String        @id @default(uuid())
+  id          String   @id @default(uuid())
   pageId      String
-  linkPage    LinkPage      @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  type        ComponentType
-  order       Int           // To determine the rendering order on the page
-  content     Json          // Flexible JSON to store component-specific data
-                          // e.g., for TEXT: { "textValue": "Hello", "alignment": "center", "fontSize": "16px" }
-                          // e.g., for IMAGE: { "src": "url", "alt": "description", "width": "100%" }
-                          // e.g., for LINK: { "title": "My Site", "url": "https://...", "icon": "some-icon" }
-  styles      Json?         // Optional: Component-specific styling overrides (e.g., colors, fonts, padding, margins)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  linkPage    LinkPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type        String   // TEXT, IMAGE, VIDEO, ICON, LINK, HEADER, BUTTON, SOCIALS, SPACER, DIVIDER, EMBED
+  order       Int      // To determine the rendering order on the page
+  content     String   // JSON string to store component-specific data
+                      // e.g., for TEXT: { "textValue": "Hello", "alignment": "center", "fontSize": "16px" }
+                      // e.g., for IMAGE: { "src": "url", "alt": "description", "width": "100%" }
+                      // e.g., for LINK: { "title": "My Site", "url": "https://...", "icon": "some-icon" }
+  styles      String?  // Optional: JSON string for component-specific styling overrides
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([pageId, order]) // Index for efficient querying of components for a page in order
 }

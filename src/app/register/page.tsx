@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent } from "react"; // Added ChangeEvent
-import { signIn } from "next-auth/react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,14 +13,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// Assuming useToast is part of sonner or a separate toast component setup
-// If you are using sonner directly for toasts, you might import { toast } from 'sonner'
-// For now, let's assume a custom hook or that sonner provides useToast via @/components/ui/sonner
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -33,48 +30,46 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (result?.error) {
-        const errorMessage =
-          result.error === "CredentialsSignin"
-            ? "Invalid email or password."
-            : result.error;
-        setError(errorMessage);
+      const data = await response.json();
+
+      if (response.ok) {
         toast({
-          title: "Login Failed",
-          description: errorMessage,
-          variant: "destructive",
+          title: "Registration Successful",
+          description: data.message || "Please check your email to verify your account.",
         });
-        setIsLoading(false);
-      } else if (result?.ok) {
-        toast({
-          title: "Login Successful",
-          description: "You are now logged in.",
-        });
-        router.push("/");
+        router.push("/login");
       } else {
-        setError("An unexpected error occurred during login.");
+        setError(data.message || "Registration failed");
         toast({
-          title: "Login Error",
-          description: "An unexpected error occurred.",
+          title: "Registration Failed",
+          description: data.message || "Registration failed",
           variant: "destructive",
         });
-        setIsLoading(false);
       }
     } catch (err) {
-      console.error("Login submit error", err);
-      setError("An unexpected error occurred.");
+      console.error("Registration error", err);
+      setError("An unexpected error occurred");
       toast({
-        title: "Login Error",
+        title: "Registration Error",
         description: "An unexpected error occurred.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -84,10 +79,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Login
+            Create Account
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your credentials to access your account.
+            Enter your details to create your LinkHub account.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -101,7 +96,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setEmail(e.target.value)
-                } // Typed event
+                }
                 required
                 disabled={isLoading}
               />
@@ -114,24 +109,38 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setPassword(e.target.value)
-                } // Typed event
+                }
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setConfirmPassword(e.target.value)
+                }
                 required
                 disabled={isLoading}
               />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-sm text-center">          <p>
-            Don't have an account?{" "}
+        <CardFooter className="text-sm text-center">
+          <p>
+            Already have an account?{" "}
             <Link
-              href="/register"
+              href="/login"
               className="font-medium text-blue-600 hover:underline"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
         </CardFooter>
