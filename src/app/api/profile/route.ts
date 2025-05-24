@@ -7,17 +7,19 @@ import { updateProfileSchema } from "@/lib/schemas/profile";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }    const user = await prisma.user.findUnique({
+    }
+    const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: { profile: true },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }    const profile = user.profile;
+    }
+    const profile = user.profile;
 
     return NextResponse.json({
       displayName: profile?.displayName || session.user.name || "",
@@ -39,7 +41,7 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -49,7 +51,10 @@ export async function PUT(request: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid data", details: validation.error.flatten().fieldErrors },
+        {
+          error: "Invalid data",
+          details: validation.error.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }
@@ -60,7 +65,7 @@ export async function PUT(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }    // Update or create user profile
+    } // Update or create user profile
     const profile = await prisma.userProfile.upsert({
       where: { userId: user.id },
       update: validation.data,

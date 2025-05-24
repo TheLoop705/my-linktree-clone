@@ -8,13 +8,13 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+} from "~/components/ui/card";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
+import { Switch } from "~/components/ui/switch";
+import { useToast } from "~/hooks/use-toast";
 
 interface UserProfileData {
   displayName: string;
@@ -108,14 +108,10 @@ export default function ProfilePage() {
       console.error("Error loading page data:", error);
     }
   };
+
   const handleProfileChange = (name: string, value: string) => {
     setProfile((prev) => ({ ...prev, [name]: value }));
-    // Clear error for this field
-    if (errors[name]) {
-      const newErrors = { ...errors };
-      delete newErrors[name];
-      setErrors(newErrors);
-    }
+    setErrors((prev) => ({ ...prev, [name]: undefined })); // Clear error for this field
   };
 
   const handlePageChange = (name: string, value: string | boolean) => {
@@ -258,9 +254,7 @@ export default function ProfilePage() {
                 <Textarea
                   id="bio"
                   value={profile.bio}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    handleProfileChange("bio", e.target.value)
-                  }
+                  onChange={(e) => handleProfileChange("bio", e.target.value)}
                   placeholder="Tell us about yourself..."
                   rows={3}
                 />

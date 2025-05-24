@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation';
-import { prisma } from '@/lib/db/prisma';
-import Link from 'next/link';
-import { ExternalLink, User } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/db/prisma";
+import Link from "next/link";
+import { ExternalLink, User } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface PageProps {
   params: {
@@ -14,27 +14,27 @@ interface PageProps {
 async function getPageData(slug: string) {
   try {
     const page = await prisma.linkPage.findUnique({
-      where: { 
+      where: {
         slug,
-        isPublic: true 
+        isPublic: true,
       },
       include: {
         links: {
           where: { isActive: true },
-          orderBy: { position: 'asc' }
+          orderBy: { position: "asc" },
         },
         user: {
           include: {
-            profile: true
-          }
+            profile: true,
+          },
         },
-        theme: true
-      }
+        theme: true,
+      },
     });
 
     return page;
   } catch (error) {
-    console.error('Error fetching page:', error);
+    console.error("Error fetching page:", error);
     return null;
   }
 }
@@ -52,33 +52,35 @@ export default async function PublicPage({ params }: PageProps) {
   // Apply theme styles based on theme name
   const getThemeStyles = (themeName?: string) => {
     switch (themeName) {
-      case 'dark':
+      case "dark":
         return {
-          containerClass: 'min-h-screen py-8 px-4 bg-gray-900 text-white',
-          cardClass: 'bg-gray-800 border-gray-700 hover:bg-gray-750',
-          accentColor: '#a855f7',
-          textColor: 'text-white'
+          containerClass: "min-h-screen py-8 px-4 bg-gray-900 text-white",
+          cardClass: "bg-gray-800 border-gray-700 hover:bg-gray-750",
+          accentColor: "#a855f7",
+          textColor: "text-white",
         };
-      case 'gradient':
+      case "gradient":
         return {
-          containerClass: 'min-h-screen py-8 px-4 bg-gradient-to-br from-pink-500 to-orange-400 text-white',
-          cardClass: 'bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20',
-          accentColor: '#ffffff',
-          textColor: 'text-white'
+          containerClass:
+            "min-h-screen py-8 px-4 bg-gradient-to-br from-pink-500 to-orange-400 text-white",
+          cardClass:
+            "bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20",
+          accentColor: "#ffffff",
+          textColor: "text-white",
         };
-      case 'minimal':
+      case "minimal":
         return {
-          containerClass: 'min-h-screen py-8 px-4 bg-gray-50 text-gray-900',
-          cardClass: 'bg-white border-gray-200 hover:bg-gray-50',
-          accentColor: '#000000',
-          textColor: 'text-gray-900'
+          containerClass: "min-h-screen py-8 px-4 bg-gray-50 text-gray-900",
+          cardClass: "bg-white border-gray-200 hover:bg-gray-50",
+          accentColor: "#000000",
+          textColor: "text-gray-900",
         };
       default: // 'default'
         return {
-          containerClass: 'min-h-screen py-8 px-4 bg-white text-gray-900',
-          cardClass: 'bg-white border-gray-200 hover:bg-gray-50',
-          accentColor: '#3b82f6',
-          textColor: 'text-gray-900'
+          containerClass: "min-h-screen py-8 px-4 bg-white text-gray-900",
+          cardClass: "bg-white border-gray-200 hover:bg-gray-50",
+          accentColor: "#3b82f6",
+          textColor: "text-gray-900",
         };
     }
   };
@@ -96,7 +98,7 @@ export default async function PublicPage({ params }: PageProps) {
               className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white shadow-lg"
             />
           ) : (
-            <div 
+            <div
               className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-white shadow-lg"
               style={{ backgroundColor: themeStyles.accentColor }}
             >
@@ -127,8 +129,8 @@ export default async function PublicPage({ params }: PageProps) {
         <div className="space-y-4">
           {links.length > 0 ? (
             links.map((link) => (
-              <Card 
-                key={link.id} 
+              <Card
+                key={link.id}
                 className={`hover:shadow-md transition-shadow duration-200 border-0 shadow-sm ${themeStyles.cardClass}`}
               >
                 <CardContent className="p-0">
@@ -142,7 +144,9 @@ export default async function PublicPage({ params }: PageProps) {
                       <div className="flex-1">
                         <h3 className="font-medium text-lg">{link.title}</h3>
                         {link.description && (
-                          <p className="text-sm opacity-75 mt-1">{link.description}</p>
+                          <p className="text-sm opacity-75 mt-1">
+                            {link.description}
+                          </p>
                         )}
                       </div>
                       <ExternalLink className="w-5 h-5 opacity-50" />
@@ -154,7 +158,9 @@ export default async function PublicPage({ params }: PageProps) {
           ) : (
             <div className="text-center py-12">
               <p className="opacity-75 mb-4">No links available yet</p>
-              <p className="text-sm opacity-50">Check back later for updates!</p>
+              <p className="text-sm opacity-50">
+                Check back later for updates!
+              </p>
             </div>
           )}
         </div>
@@ -163,9 +169,9 @@ export default async function PublicPage({ params }: PageProps) {
         {profile?.websiteUrl && (
           <div className="mt-8 text-center">
             <Button asChild variant="outline" size="sm">
-              <Link 
-                href={profile.websiteUrl} 
-                target="_blank" 
+              <Link
+                href={profile.websiteUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2"
               >
@@ -179,9 +185,9 @@ export default async function PublicPage({ params }: PageProps) {
         {/* Footer */}
         <div className="mt-12 text-center">
           <p className="text-sm opacity-50">
-            Powered by{' '}
-            <Link 
-              href="/" 
+            Powered by{" "}
+            <Link
+              href="/"
               className="hover:underline font-medium"
               style={{ color: themeStyles.accentColor }}
             >
@@ -201,7 +207,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!pageData) {
     return {
-      title: 'Page Not Found',
+      title: "Page Not Found",
     };
   }
 
@@ -210,10 +216,16 @@ export async function generateMetadata({ params }: PageProps) {
 
   return {
     title: title || profile?.displayName || `${user.email}'s LinkHub`,
-    description: description || profile?.bio || `Check out ${user.email}'s links on LinkHub`,
+    description:
+      description ||
+      profile?.bio ||
+      `Check out ${user.email}'s links on LinkHub`,
     openGraph: {
       title: title || profile?.displayName || `${user.email}'s LinkHub`,
-      description: description || profile?.bio || `Check out ${user.email}'s links on LinkHub`,
+      description:
+        description ||
+        profile?.bio ||
+        `Check out ${user.email}'s links on LinkHub`,
       images: profile?.profileImageUrl ? [profile.profileImageUrl] : [],
     },
   };

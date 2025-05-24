@@ -125,7 +125,9 @@ export default function LoginPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-sm text-center">          <p>
+        <CardFooter className="text-sm text-center">
+          {" "}
+          <p>
             Don't have an account?{" "}
             <Link
               href="/register"

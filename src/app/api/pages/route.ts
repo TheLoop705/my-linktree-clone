@@ -4,12 +4,18 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
 
-const createLinkSchema = z.object({
-  pageId: z.string().uuid(),
-  title: z.string().min(1).max(100),
-  url: z.string().url(),
+const createPageSchema = z.object({
+  slug: z
+    .string()
+    .min(1)
+    .max(50)
+    .regex(
+      /^[a-zA-Z0-9-_]+$/,
+      "Slug can only contain letters, numbers, hyphens, and underscores"
+    ),
+  title: z.string().optional(),
   description: z.string().optional(),
-  position: z.number().int().min(0).default(0),
+  isPublic: z.boolean().default(true),
 });
 
 export async function POST(request: NextRequest) {
@@ -21,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const validationResult = createLinkSchema.safeParse(body);
+    const validationResult = createPageSchema.safeParse(body);
 
     if (!validationResult.success) {
       return NextResponse.json(
@@ -30,7 +36,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { pageId, title, url, description, position } = validationResult.data;
+    const { slug, title, description, isPublic } = validationResult.data;
 
     // Find the user
     const user = await prisma.user.findUnique({
@@ -41,36 +47,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Verify the page belongs to the user
-    const page = await prisma.linkPage.findFirst({
-      where: {
-        id: pageId,
-        userId: user.id,
-      },
+    // Check if slug is already taken
+    const existingPage = await prisma.linkPage.findUnique({
+      where: { slug },
     });
 
-    if (!page) {
+    if (existingPage) {
       return NextResponse.json(
-        { error: "Page not found or access denied" },
-        { status: 404 }
+        { error: "Slug already taken" },
+        { status: 400 }
       );
     }
 
-    // Create the link
-    const link = await prisma.link.create({
+    // Create the page
+    const page = await prisma.linkPage.create({
       data: {
-        pageId,
+        userId: user.id,
+        slug,
         title,
-        url,
         description,
-        position,
-        isActive: true,
+        isPublic,
+      },
+      include: {
+        links: {
+          orderBy: { position: "asc" },
+        },
       },
     });
 
-    return NextResponse.json(link);
+    return NextResponse.json(page);
   } catch (error) {
-    console.error("Error creating link:", error);
+    console.error("Error creating page:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

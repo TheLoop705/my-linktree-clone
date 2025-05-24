@@ -5,7 +5,11 @@ import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
 
 const updatePageSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title too long").optional(),
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(100, "Title too long")
+    .optional(),
   description: z.string().max(500, "Description too long").optional(),
   isPublic: z.boolean().optional(),
   theme: z.string().optional(),
@@ -17,7 +21,7 @@ export async function PUT(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -28,7 +32,10 @@ export async function PUT(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid data", details: validation.error.flatten().fieldErrors },
+        {
+          error: "Invalid data",
+          details: validation.error.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }

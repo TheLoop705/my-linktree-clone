@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
-  Settings, 
-  User, 
+import {
+  LayoutDashboard,
+  Settings,
+  User,
   LogOut,
-  Link as LinkIcon
+  Link as LinkIcon,
 } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -50,17 +50,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <h1 className="text-2xl font-bold text-gray-900">LinkHub</h1>
               </Link>
             </div>
-            
+
             <nav className="hidden md:flex items-center space-x-6">
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
               >
                 <LayoutDashboard className="h-4 w-4 mr-2" />
                 Dashboard
               </Link>
-              <Link 
-                href="/dashboard/profile" 
+              <Link
+                href="/dashboard/profile"
                 className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
               >
                 <Settings className="h-4 w-4 mr-2" />
@@ -71,12 +71,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <User className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">{session.user?.email}</span>
+                <span className="text-sm text-gray-600">
+                  {session.user?.email}
+                </span>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => signOut({ callbackUrl: '/' })}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="flex items-center"
               >
                 <LogOut className="h-4 w-4 mr-2" />
@@ -91,15 +93,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="md:hidden bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-6 py-2">
-            <Link 
-              href="/dashboard" 
+            <Link
+              href="/dashboard"
               className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm"
             >
               <LayoutDashboard className="h-4 w-4 mr-2" />
               Dashboard
             </Link>
-            <Link 
-              href="/dashboard/profile" 
+            <Link
+              href="/dashboard/profile"
               className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm"
             >
               <Settings className="h-4 w-4 mr-2" />

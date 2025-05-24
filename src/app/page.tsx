@@ -3,7 +3,13 @@
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight, Link as LinkIcon, Users, Palette, BarChart3 } from "lucide-react";
+import {
+  ArrowRight,
+  Link as LinkIcon,
+  Users,
+  Palette,
+  BarChart3,
+} from "lucide-react";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -56,10 +62,11 @@ export default function HomePage() {
             One link to rule them all
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Share all your important links in one beautiful, customizable page. 
-            Perfect for social media bios, business cards, and everywhere else you need to share multiple links.
+            Share all your important links in one beautiful, customizable page.
+            Perfect for social media bios, business cards, and everywhere else
+            you need to share multiple links.
           </p>
-          
+
           {!session && (
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button size="lg" asChild>
@@ -97,30 +104,30 @@ export default function HomePage() {
             </div>
             <h3 className="text-xl font-semibold mb-2">Easy Link Management</h3>
             <p className="text-gray-600">
-              Add, organize, and manage all your important links in one place. 
+              Add, organize, and manage all your important links in one place.
               Perfect for social media, portfolios, and business.
             </p>
           </div>
-          
+
           <div className="text-center">
             <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Palette className="h-8 w-8 text-purple-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Beautiful Themes</h3>
             <p className="text-gray-600">
-              Customize your page with beautiful themes and colors that match your brand. 
-              Make your link page uniquely yours.
+              Customize your page with beautiful themes and colors that match
+              your brand. Make your link page uniquely yours.
             </p>
           </div>
-          
+
           <div className="text-center">
             <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <BarChart3 className="h-8 w-8 text-green-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Analytics</h3>
             <p className="text-gray-600">
-              Track clicks and visitor data to understand how people interact with your links. 
-              Make data-driven decisions.
+              Track clicks and visitor data to understand how people interact
+              with your links. Make data-driven decisions.
             </p>
           </div>
         </div>
@@ -131,7 +138,8 @@ export default function HomePage() {
             Ready to get started?
           </h2>
           <p className="text-gray-600 mb-6">
-            Join thousands of creators, businesses, and influencers who trust LinkHub.
+            Join thousands of creators, businesses, and influencers who trust
+            LinkHub.
           </p>
           {!session && (
             <Button size="lg" asChild>
@@ -155,7 +163,8 @@ export default function HomePage() {
             <p className="text-gray-400">
               © 2024 LinkHub. All rights reserved.
             </p>
-          </div>        </div>
+          </div>{" "}
+        </div>
       </footer>
     </div>
   );

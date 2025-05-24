@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { prisma } from '@/lib/db/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/db/prisma";
+import { z } from "zod";
 
 const updateLinkSchema = z.object({
   title: z.string().min(1).max(100).optional(),
   url: z.string().url().optional(),
   description: z.string().optional(),
   isActive: z.boolean().optional(),
-  position: z.number().int().min(0).optional()
+  position: z.number().int().min(0).optional(),
 });
 
 export async function PATCH(
@@ -18,12 +18,9 @@ export async function PATCH(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -31,7 +28,7 @@ export async function PATCH(
 
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Invalid input', details: validationResult.error.issues },
+        { error: "Invalid input", details: validationResult.error.issues },
         { status: 400 }
       );
     }
@@ -40,14 +37,11 @@ export async function PATCH(
 
     // Find the user
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { email: session.user.email },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Verify the link belongs to the user
@@ -55,14 +49,14 @@ export async function PATCH(
       where: {
         id: linkId,
         page: {
-          userId: user.id
-        }
-      }
+          userId: user.id,
+        },
+      },
     });
 
     if (!link) {
       return NextResponse.json(
-        { error: 'Link not found or access denied' },
+        { error: "Link not found or access denied" },
         { status: 404 }
       );
     }
@@ -70,14 +64,14 @@ export async function PATCH(
     // Update the link
     const updatedLink = await prisma.link.update({
       where: { id: linkId },
-      data: validationResult.data
+      data: validationResult.data,
     });
 
     return NextResponse.json(updatedLink);
   } catch (error) {
-    console.error('Error updating link:', error);
+    console.error("Error updating link:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -89,26 +83,20 @@ export async function DELETE(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { linkId } = params;
 
     // Find the user
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { email: session.user.email },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Verify the link belongs to the user
@@ -116,28 +104,28 @@ export async function DELETE(
       where: {
         id: linkId,
         page: {
-          userId: user.id
-        }
-      }
+          userId: user.id,
+        },
+      },
     });
 
     if (!link) {
       return NextResponse.json(
-        { error: 'Link not found or access denied' },
+        { error: "Link not found or access denied" },
         { status: 404 }
       );
     }
 
     // Delete the link
     await prisma.link.delete({
-      where: { id: linkId }
+      where: { id: linkId },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting link:', error);
+    console.error("Error deleting link:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

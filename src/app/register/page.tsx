@@ -50,7 +50,8 @@ export default function RegisterPage() {
       if (response.ok) {
         toast({
           title: "Registration Successful",
-          description: data.message || "Please check your email to verify your account.",
+          description:
+            data.message || "Please check your email to verify your account.",
         });
         router.push("/login");
       } else {
