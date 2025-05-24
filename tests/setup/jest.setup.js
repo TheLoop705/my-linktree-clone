@@ -129,14 +129,18 @@ jest.mock("next/server", () => ({
   NextResponse: {
     json: (object, init = {}) => global.Response.json(object, init),
     redirect: (url, init = {}) =>
-      new global.Response(null, { ...init, status: 302, headers: { Location: url } }),
+      new global.Response(null, {
+        ...init,
+        status: 302,
+        headers: { Location: url },
+      }),
     next: (init = {}) => new global.Response(null, init),
   },
 }));
 
 // Mock Prisma to use Node.js client in tests
-jest.mock('@prisma/client', () => {
-  const { PrismaClient } = jest.requireActual('@prisma/client');
+jest.mock("@prisma/client", () => {
+  const { PrismaClient } = jest.requireActual("@prisma/client");
   return {
     PrismaClient: jest.fn().mockImplementation(() => {
       return new PrismaClient({
@@ -151,6 +155,6 @@ jest.mock('@prisma/client', () => {
 });
 
 // Set test environment variables
-process.env.NODE_ENV = 'test';
-process.env.TEST_DATABASE_URL = 'file:./test.db';
-process.env.DATABASE_URL = 'file:./test.db';
+process.env.NODE_ENV = "test";
+process.env.TEST_DATABASE_URL = "file:./test.db";
+process.env.DATABASE_URL = "file:./test.db";

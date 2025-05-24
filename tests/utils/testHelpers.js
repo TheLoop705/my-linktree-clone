@@ -2,9 +2,10 @@ const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 
 // Ensure we're using the test database
-const databaseUrl = process.env.NODE_ENV === 'test' 
-  ? (process.env.TEST_DATABASE_URL || "file:./prisma/test.db")
-  : "file:./prisma/test.db";
+const databaseUrl =
+  process.env.NODE_ENV === "test"
+    ? process.env.TEST_DATABASE_URL || "file:./prisma/test.db"
+    : "file:./prisma/test.db";
 
 const testDb = new PrismaClient({
   datasources: {
@@ -15,8 +16,8 @@ const testDb = new PrismaClient({
 });
 
 // Debug logging for test environment
-if (process.env.NODE_ENV === 'test') {
-  console.log('Test database URL:', databaseUrl);
+if (process.env.NODE_ENV === "test") {
+  console.log("Test database URL:", databaseUrl);
 }
 
 /**

@@ -275,7 +275,8 @@ describe("Page Management API Logic", () => {
 
     beforeEach(async () => {
       testPage = await createTestLinkPage(testUser.id);
-    });    it("should create page analytics record", async () => {
+    });
+    it("should create page analytics record", async () => {
       const analyticsData = {
         pageId: testPage.id,
         visitorIp: "127.0.0.1",
