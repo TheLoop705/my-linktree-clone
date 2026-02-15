@@ -2,19 +2,8 @@
 
 import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -27,6 +16,7 @@ export default function RegisterPage() {
   );
   const router = useRouter();
   const { toast } = useToast();
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
@@ -58,10 +48,8 @@ export default function RegisterPage() {
         });
         router.push("/login");
       } else {
-        // Handle field-specific errors
         if (data.errors) {
           setFieldErrors(data.errors);
-          const errorMessages = Object.values(data.errors).flat().join(", ");
           setError(data.message || "Please fix the validation errors");
         } else {
           setError(data.message || "Registration failed");
@@ -88,99 +76,160 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Create Account
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your details to create your LinkHub account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {" "}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setEmail(e.target.value)
-                }
-                required
-                disabled={isLoading}
-                className={fieldErrors.email ? "border-red-500" : ""}
-              />
+    <div className="auth-wrapper">
+      <div className="auth-card card">
+        <div className="card-header">
+          <Link
+            href="/"
+            className="d-flex align-items-center justify-content-center text-decoration-none mb-3"
+          >
+            <i
+              className="bi bi-link-45deg fs-2 me-2"
+              style={{ color: "var(--lh-primary)" }}
+            ></i>
+            <span className="fw-bold fs-4" style={{ color: "var(--lh-dark)" }}>
+              LinkHub
+            </span>
+          </Link>
+          <h4 className="fw-bold mb-1">Create your account</h4>
+          <p className="text-muted small mb-0">
+            Enter your details to get started with LinkHub.
+          </p>
+        </div>
+
+        <div className="card-body">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label fw-medium">
+                Email address
+              </label>
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  <i className="bi bi-envelope text-muted"></i>
+                </span>
+                <input
+                  id="email"
+                  type="email"
+                  className={`form-control border-start-0 ps-0 ${fieldErrors.email ? "is-invalid" : ""}`}
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setEmail(e.target.value)
+                  }
+                  required
+                  disabled={isLoading}
+                />
+              </div>
               {fieldErrors.email && (
-                <div className="text-sm text-red-500">
+                <div className="text-danger small mt-1">
                   {fieldErrors.email.map((error, index) => (
                     <div key={index}>{error}</div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
-                }
-                required
-                disabled={isLoading}
-                className={fieldErrors.password ? "border-red-500" : ""}
-              />
-              {fieldErrors.password && (
-                <div className="text-sm text-red-500">
+
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label fw-medium">
+                Password
+              </label>
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  <i className="bi bi-lock text-muted"></i>
+                </span>
+                <input
+                  id="password"
+                  type="password"
+                  className={`form-control border-start-0 ps-0 ${fieldErrors.password ? "is-invalid" : ""}`}
+                  placeholder="Create a strong password"
+                  value={password}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setPassword(e.target.value)
+                  }
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              {fieldErrors.password ? (
+                <div className="text-danger small mt-1">
                   {fieldErrors.password.map((error, index) => (
                     <div key={index}>{error}</div>
                   ))}
                 </div>
-              )}
-              {!fieldErrors.password && (
-                <div className="text-xs text-gray-500">
-                  Password must be at least 8 characters with uppercase,
-                  lowercase, and numbers
+              ) : (
+                <div className="form-text">
+                  <i className="bi bi-info-circle me-1"></i>
+                  Must be 8+ characters with uppercase, lowercase, and numbers
                 </div>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setConfirmPassword(e.target.value)
-                }
-                required
-                disabled={isLoading}
-              />
+
+            <div className="mb-3">
+              <label
+                htmlFor="confirmPassword"
+                className="form-label fw-medium"
+              >
+                Confirm Password
+              </label>
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  <i className="bi bi-shield-lock text-muted"></i>
+                </span>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  className="form-control border-start-0 ps-0"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setConfirmPassword(e.target.value)
+                  }
+                  required
+                  disabled={isLoading}
+                />
+              </div>
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="text-sm text-center">
-          <p>
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-medium text-blue-600 hover:underline"
+
+            {error && (
+              <div className="alert alert-danger py-2 small" role="alert">
+                <i className="bi bi-exclamation-circle me-1"></i>
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="btn btn-primary w-100 py-2 fw-semibold mt-2"
+              disabled={isLoading}
             >
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
+              {isLoading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  Create Account <i className="bi bi-arrow-right ms-1"></i>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        <div className="card-footer">
+          <span className="text-muted">Already have an account? </span>
+          <Link
+            href="/login"
+            className="fw-semibold text-decoration-none"
+            style={{ color: "var(--lh-primary)" }}
+          >
+            Sign in
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

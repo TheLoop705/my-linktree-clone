@@ -3,29 +3,9 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import {
-  Trash2,
-  ExternalLink,
-  Plus,
-  Settings,
-  Eye,
-  GripVertical,
-} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface Link {
+interface LinkItem {
   id: string;
   title: string;
   url: string;
@@ -43,25 +23,14 @@ interface UserPage {
   theme?: {
     themeName?: string;
   };
-  links: Link[];
+  links: LinkItem[];
 }
 
-// Add theme options
 const THEME_OPTIONS = [
-  { value: "default", label: "Default", bg: "bg-white", accent: "bg-blue-600" },
-  {
-    value: "dark",
-    label: "Dark Mode",
-    bg: "bg-gray-900",
-    accent: "bg-purple-600",
-  },
-  {
-    value: "gradient",
-    label: "Gradient",
-    bg: "bg-gradient-to-br from-pink-500 to-orange-400",
-    accent: "bg-white",
-  },
-  { value: "minimal", label: "Minimal", bg: "bg-gray-50", accent: "bg-black" },
+  { value: "default", label: "Default", cssClass: "theme-default" },
+  { value: "dark", label: "Dark", cssClass: "theme-dark" },
+  { value: "gradient", label: "Gradient", cssClass: "theme-gradient" },
+  { value: "minimal", label: "Minimal", cssClass: "theme-minimal" },
 ];
 
 export default function Dashboard() {
@@ -87,7 +56,6 @@ export default function Dashboard() {
         const data = await response.json();
         setUserPage(data);
       } else {
-        // Create a default page if none exists
         await createDefaultPage();
       }
     } catch (error) {
@@ -106,9 +74,7 @@ export default function Dashboard() {
     try {
       const response = await fetch("/api/pages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug: `${session?.user?.email?.split("@")[0] || "user"}-${Date.now()}`,
           title: `${session?.user?.email}'s Links`,
@@ -143,9 +109,7 @@ export default function Dashboard() {
     try {
       const response = await fetch("/api/links", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pageId: userPage?.id,
           ...newLink,
@@ -156,19 +120,11 @@ export default function Dashboard() {
       if (response.ok) {
         const linkData = await response.json();
         setUserPage((prev) =>
-          prev
-            ? {
-                ...prev,
-                links: [...prev.links, linkData],
-              }
-            : null
+          prev ? { ...prev, links: [...prev.links, linkData] } : null
         );
         setNewLink({ title: "", url: "", description: "" });
         setIsAddingLink(false);
-        toast({
-          title: "Success",
-          description: "Link added successfully!",
-        });
+        toast({ title: "Success", description: "Link added successfully!" });
       } else {
         throw new Error("Failed to add link");
       }
@@ -191,16 +147,10 @@ export default function Dashboard() {
       if (response.ok) {
         setUserPage((prev) =>
           prev
-            ? {
-                ...prev,
-                links: prev.links.filter((link) => link.id !== linkId),
-              }
+            ? { ...prev, links: prev.links.filter((l) => l.id !== linkId) }
             : null
         );
-        toast({
-          title: "Success",
-          description: "Link deleted successfully!",
-        });
+        toast({ title: "Success", description: "Link deleted successfully!" });
       } else {
         throw new Error("Failed to delete link");
       }
@@ -218,9 +168,7 @@ export default function Dashboard() {
     try {
       const response = await fetch(`/api/links/${linkId}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive }),
       });
 
@@ -254,9 +202,7 @@ export default function Dashboard() {
     try {
       const response = await fetch(`/api/pages/${userPage.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ theme: newTheme }),
       });
       if (response.ok) {
@@ -266,7 +212,6 @@ export default function Dashboard() {
         toast({
           title: "Success",
           description: "Theme updated successfully!",
-          variant: "default",
         });
       } else {
         throw new Error("Failed to update theme");
@@ -283,273 +228,360 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: "400px" }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
+          <div className="spinner-border spinner-linkhub" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted mt-3">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Manage your LinkHub page and links</p>
-        </div>
-        <div className="flex gap-2">
-          {userPage && (
-            <Button asChild variant="outline">
-              <Link href={`/${userPage.slug}`} target="_blank">
-                <Eye className="w-4 h-4 mr-2" />
-                View Page
-              </Link>
-            </Button>
-          )}
-          <Button asChild variant="outline">
-            <Link href="/dashboard/profile">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {/* Page Info */}
-      {userPage && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Your LinkHub Page</CardTitle>
-            <CardDescription>
-              Your public page is available at:
+    <div className="row justify-content-center">
+      <div className="col-12 col-xl-10 col-xxl-8">
+        {/* Page Header */}
+        <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4">
+          <div className="mb-3 mb-md-0">
+            <h2 className="fw-bold mb-1" style={{ color: "var(--lh-dark)" }}>
+              Dashboard
+            </h2>
+            <p className="text-muted mb-0">Manage your LinkHub page and links</p>
+          </div>
+          <div className="d-flex gap-2">
+            {userPage && (
               <Link
                 href={`/${userPage.slug}`}
                 target="_blank"
-                className="ml-2 text-blue-600 hover:underline"
+                className="btn btn-outline-primary btn-sm d-flex align-items-center"
               >
-                {window.location.origin}/{userPage.slug}
-                <ExternalLink className="w-3 h-3 ml-1 inline" />
+                <i className="bi bi-eye me-1"></i>
+                View Page
               </Link>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="page-title">Page Title</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  {userPage.title || "Untitled Page"}
-                </p>
-              </div>
-              <div>
-                <Label htmlFor="page-description">Description</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  {userPage.description || "No description"}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Theme Customization */}
-      {userPage && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Theme Customization</CardTitle>
-            <CardDescription>
-              Choose a theme for your LinkHub page.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              {" "}
-              {THEME_OPTIONS.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={
-                    userPage.theme?.themeName === option.value
-                      ? "default"
-                      : "outline"
-                  }
-                  className="flex-1"
-                  onClick={() => updateTheme(option.value)}
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Links Management */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Your Links</CardTitle>
-            <CardDescription>
-              Add, edit, and manage your links. Drag to reorder them.
-            </CardDescription>
+            )}
+            <Link
+              href="/dashboard/profile"
+              className="btn btn-outline-secondary btn-sm d-flex align-items-center"
+            >
+              <i className="bi bi-gear me-1"></i>
+              Settings
+            </Link>
           </div>
-          <Button onClick={() => setIsAddingLink(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Link
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Add Link Form */}
-          {isAddingLink && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Add New Link</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="link-title">Title</Label>
-                  <Input
-                    id="link-title"
-                    placeholder="e.g., My Portfolio"
-                    value={newLink.title}
-                    onChange={(e) =>
-                      setNewLink((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="link-url">URL</Label>
-                  <Input
-                    id="link-url"
-                    placeholder="https://example.com"
-                    value={newLink.url}
-                    onChange={(e) =>
-                      setNewLink((prev) => ({ ...prev, url: e.target.value }))
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="link-description">
-                    Description (optional)
-                  </Label>{" "}
-                  <Textarea
-                    id="link-description"
-                    placeholder="Brief description of this link"
-                    value={newLink.description}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      setNewLink((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={addLink}>Add Link</Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsAddingLink(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+        </div>
 
-          {/* Links List */}
-          {userPage?.links && userPage.links.length > 0 ? (
-            <div className="space-y-3">
-              {userPage.links
-                .sort((a, b) => a.position - b.position)
-                .map((link) => (
-                  <Card
-                    key={link.id}
-                    className={`${!link.isActive ? "opacity-50" : ""}`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
-                          <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-                          <div className="flex-1">
-                            <h3 className="font-medium">{link.title}</h3>
-                            <p className="text-sm text-gray-600 truncate">
+        {/* Quick Stats */}
+        <div className="row g-3 mb-4">
+          <div className="col-sm-4">
+            <div className="card stat-card p-3">
+              <div className="d-flex align-items-center">
+                <div
+                  className="rounded-3 d-flex align-items-center justify-content-center me-3"
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    background: "linear-gradient(135deg, #ede9fe, #ddd6fe)",
+                  }}
+                >
+                  <i className="bi bi-link-45deg fs-4" style={{ color: "#7c3aed" }}></i>
+                </div>
+                <div>
+                  <div className="stat-value">{userPage?.links?.length || 0}</div>
+                  <div className="stat-label">Total Links</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-4">
+            <div className="card stat-card p-3">
+              <div className="d-flex align-items-center">
+                <div
+                  className="rounded-3 d-flex align-items-center justify-content-center me-3"
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    background: "linear-gradient(135deg, #d1fae5, #a7f3d0)",
+                  }}
+                >
+                  <i className="bi bi-check-circle fs-4" style={{ color: "#059669" }}></i>
+                </div>
+                <div>
+                  <div className="stat-value">
+                    {userPage?.links?.filter((l) => l.isActive).length || 0}
+                  </div>
+                  <div className="stat-label">Active Links</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-4">
+            <div className="card stat-card p-3">
+              <div className="d-flex align-items-center">
+                <div
+                  className="rounded-3 d-flex align-items-center justify-content-center me-3"
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    background: "linear-gradient(135deg, #dbeafe, #bfdbfe)",
+                  }}
+                >
+                  <i
+                    className={`bi ${userPage?.isPublic ? "bi-globe" : "bi-lock"} fs-4`}
+                    style={{ color: "#2563eb" }}
+                  ></i>
+                </div>
+                <div>
+                  <div className="stat-value">
+                    {userPage?.isPublic ? "Public" : "Private"}
+                  </div>
+                  <div className="stat-label">Page Status</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Page Info Card */}
+        {userPage && (
+          <div className="card border-0 shadow-sm rounded-4 mb-4">
+            <div className="card-body p-4">
+              <div className="d-flex align-items-center mb-3">
+                <i className="bi bi-file-earmark-text fs-5 me-2" style={{ color: "var(--lh-primary)" }}></i>
+                <h5 className="fw-bold mb-0">Your LinkHub Page</h5>
+              </div>
+              <p className="text-muted mb-2">
+                Your public page is available at:{" "}
+                <Link
+                  href={`/${userPage.slug}`}
+                  target="_blank"
+                  className="fw-semibold text-decoration-none"
+                  style={{ color: "var(--lh-primary)" }}
+                >
+                  {typeof window !== "undefined" && window.location.origin}/
+                  {userPage.slug}{" "}
+                  <i className="bi bi-box-arrow-up-right small"></i>
+                </Link>
+              </p>
+              <div className="row mt-3">
+                <div className="col-md-6">
+                  <small className="text-muted fw-medium text-uppercase">
+                    Page Title
+                  </small>
+                  <p className="mb-0">{userPage.title || "Untitled Page"}</p>
+                </div>
+                <div className="col-md-6">
+                  <small className="text-muted fw-medium text-uppercase">
+                    Description
+                  </small>
+                  <p className="mb-0">
+                    {userPage.description || "No description"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Theme Customization */}
+        {userPage && (
+          <div className="card border-0 shadow-sm rounded-4 mb-4">
+            <div className="card-body p-4">
+              <div className="d-flex align-items-center mb-3">
+                <i className="bi bi-palette fs-5 me-2" style={{ color: "var(--lh-secondary)" }}></i>
+                <h5 className="fw-bold mb-0">Theme</h5>
+              </div>
+              <p className="text-muted small mb-3">
+                Choose a theme for your public page.
+              </p>
+              <div className="d-flex gap-3 align-items-center">
+                {THEME_OPTIONS.map((option) => (
+                  <div key={option.value} className="text-center">
+                    <div
+                      className={`theme-option ${option.cssClass} ${
+                        userPage.theme?.themeName === option.value ? "active" : ""
+                      }`}
+                      onClick={() => updateTheme(option.value)}
+                      title={option.label}
+                    >
+                      {userPage.theme?.themeName === option.value && (
+                        <span className="check-mark">
+                          <i className="bi bi-check"></i>
+                        </span>
+                      )}
+                    </div>
+                    <small className="text-muted d-block mt-1" style={{ fontSize: "0.7rem" }}>
+                      {option.label}
+                    </small>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Links Management */}
+        <div className="card border-0 shadow-sm rounded-4 mb-4">
+          <div className="card-body p-4">
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <div className="d-flex align-items-center">
+                <i className="bi bi-list-ul fs-5 me-2" style={{ color: "var(--lh-accent)" }}></i>
+                <div>
+                  <h5 className="fw-bold mb-0">Your Links</h5>
+                  <small className="text-muted">Add and manage your links</small>
+                </div>
+              </div>
+              <button
+                className="btn btn-primary btn-sm d-flex align-items-center"
+                onClick={() => setIsAddingLink(true)}
+              >
+                <i className="bi bi-plus-lg me-1"></i>
+                Add Link
+              </button>
+            </div>
+
+            {/* Add Link Form */}
+            {isAddingLink && (
+              <div className="card bg-light border-0 rounded-3 mb-4">
+                <div className="card-body p-3">
+                  <h6 className="fw-bold mb-3">
+                    <i className="bi bi-plus-circle me-1" style={{ color: "var(--lh-primary)" }}></i>
+                    Add New Link
+                  </h6>
+                  <div className="mb-3">
+                    <label htmlFor="link-title" className="form-label fw-medium small">
+                      Title
+                    </label>
+                    <input
+                      id="link-title"
+                      type="text"
+                      className="form-control"
+                      placeholder="e.g., My Portfolio"
+                      value={newLink.title}
+                      onChange={(e) =>
+                        setNewLink((prev) => ({ ...prev, title: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="link-url" className="form-label fw-medium small">
+                      URL
+                    </label>
+                    <input
+                      id="link-url"
+                      type="url"
+                      className="form-control"
+                      placeholder="https://example.com"
+                      value={newLink.url}
+                      onChange={(e) =>
+                        setNewLink((prev) => ({ ...prev, url: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="link-description" className="form-label fw-medium small">
+                      Description (optional)
+                    </label>
+                    <textarea
+                      id="link-description"
+                      className="form-control"
+                      rows={2}
+                      placeholder="Brief description of this link"
+                      value={newLink.description}
+                      onChange={(e) =>
+                        setNewLink((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="d-flex gap-2">
+                    <button className="btn btn-primary btn-sm" onClick={addLink}>
+                      <i className="bi bi-plus me-1"></i>Add Link
+                    </button>
+                    <button
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => setIsAddingLink(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Links List */}
+            {userPage?.links && userPage.links.length > 0 ? (
+              <div className="d-flex flex-column gap-3">
+                {userPage.links
+                  .sort((a, b) => a.position - b.position)
+                  .map((link) => (
+                    <div
+                      key={link.id}
+                      className={`link-item-card p-3 ${!link.isActive ? "inactive" : ""}`}
+                    >
+                      <div className="d-flex align-items-center justify-content-between">
+                        <div className="d-flex align-items-center flex-grow-1 me-3">
+                          <i className="bi bi-grip-vertical text-muted me-3 fs-5" style={{ cursor: "move" }}></i>
+                          <div className="flex-grow-1 min-w-0">
+                            <h6 className="fw-semibold mb-0">{link.title}</h6>
+                            <small className="text-muted text-truncate d-block">
                               {link.url}
-                            </p>
+                            </small>
                             {link.description && (
-                              <p className="text-sm text-gray-500 mt-1">
+                              <small className="text-secondary mt-1 d-block">
                                 {link.description}
-                              </p>
+                              </small>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {" "}
-                          <Switch
-                            checked={link.isActive}
-                            onCheckedChange={(checked: boolean) =>
-                              toggleLinkStatus(link.id, checked)
-                            }
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                        <div className="d-flex align-items-center gap-2">
+                          <div className="form-check form-switch mb-0">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              role="switch"
+                              checked={link.isActive}
+                              onChange={(e) =>
+                                toggleLinkStatus(link.id, e.target.checked)
+                              }
+                            />
+                          </div>
+                          <button
+                            className="btn btn-sm btn-outline-secondary border-0"
                             onClick={() => window.open(link.url, "_blank")}
+                            title="Open link"
                           >
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                            <i className="bi bi-box-arrow-up-right"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger border-0"
                             onClick={() => deleteLink(link.id)}
+                            title="Delete link"
                           >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
+                            <i className="bi bi-trash"></i>
+                          </button>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">No links added yet</p>
-              <Button onClick={() => setIsAddingLink(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Your First Link
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-2xl font-bold">
-              {userPage?.links?.length || 0}
-            </div>
-            <p className="text-gray-600">Total Links</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-2xl font-bold">
-              {userPage?.links?.filter((link) => link.isActive).length || 0}
-            </div>
-            <p className="text-gray-600">Active Links</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-2xl font-bold">
-              {userPage?.isPublic ? "Public" : "Private"}
-            </div>
-            <p className="text-gray-600">Page Status</p>
-          </CardContent>
-        </Card>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-5">
+                <i className="bi bi-link-45deg display-4 text-muted"></i>
+                <p className="text-muted mt-2 mb-3">No links added yet</p>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setIsAddingLink(true)}
+                >
+                  <i className="bi bi-plus-lg me-1"></i>
+                  Add Your First Link
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,23 +1,9 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent } from "react"; // Added ChangeEvent
+import { useState, FormEvent, ChangeEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-// Assuming useToast is part of sonner or a separate toast component setup
-// If you are using sonner directly for toasts, you might import { toast } from 'sonner'
-// For now, let's assume a custom hook or that sonner provides useToast via @/components/ui/sonner
 import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -80,64 +66,115 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Login
-          </CardTitle>
-          <CardDescription className="text-center">
+    <div className="auth-wrapper">
+      <div className="auth-card card">
+        <div className="card-header">
+          <Link
+            href="/"
+            className="d-flex align-items-center justify-content-center text-decoration-none mb-3"
+          >
+            <i
+              className="bi bi-link-45deg fs-2 me-2"
+              style={{ color: "var(--lh-primary)" }}
+            ></i>
+            <span className="fw-bold fs-4" style={{ color: "var(--lh-dark)" }}>
+              LinkHub
+            </span>
+          </Link>
+          <h4 className="fw-bold mb-1">Welcome back</h4>
+          <p className="text-muted small mb-0">
             Enter your credentials to access your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setEmail(e.target.value)
-                } // Typed event
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
-                } // Typed event
-                required
-                disabled={isLoading}
-              />
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="text-sm text-center">
-          {" "}
-          <p>
-            Don't have an account?{" "}
-            <Link
-              href="/register"
-              className="font-medium text-blue-600 hover:underline"
-            >
-              Sign up
-            </Link>
           </p>
-        </CardFooter>
-      </Card>
+        </div>
+
+        <div className="card-body">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label fw-medium">
+                Email address
+              </label>
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  <i className="bi bi-envelope text-muted"></i>
+                </span>
+                <input
+                  id="email"
+                  type="email"
+                  className="form-control border-start-0 ps-0"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setEmail(e.target.value)
+                  }
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label fw-medium">
+                Password
+              </label>
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  <i className="bi bi-lock text-muted"></i>
+                </span>
+                <input
+                  id="password"
+                  type="password"
+                  className="form-control border-start-0 ps-0"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setPassword(e.target.value)
+                  }
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="alert alert-danger py-2 small" role="alert">
+                <i className="bi bi-exclamation-circle me-1"></i>
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="btn btn-primary w-100 py-2 fw-semibold mt-2"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  Logging in...
+                </>
+              ) : (
+                <>
+                  Sign In <i className="bi bi-arrow-right ms-1"></i>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        <div className="card-footer">
+          <span className="text-muted">Don&apos;t have an account? </span>
+          <Link
+            href="/register"
+            className="fw-semibold text-decoration-none"
+            style={{ color: "var(--lh-primary)" }}
+          >
+            Sign up
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

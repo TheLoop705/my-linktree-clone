@@ -2,18 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 
 interface UserProfileData {
@@ -34,7 +22,7 @@ interface PageData {
 }
 
 export default function ProfilePage() {
-  const { data: session, status, update: updateSession } = useSession();
+  const { data: session, status } = useSession();
   const { toast } = useToast();
 
   const [profile, setProfile] = useState<UserProfileData>({
@@ -58,7 +46,6 @@ export default function ProfilePage() {
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
-  // Load user profile and page data
   useEffect(() => {
     if (session?.user) {
       loadProfileData();
@@ -83,7 +70,6 @@ export default function ProfilePage() {
       });
     } catch (error) {
       console.error("Error loading profile:", error);
-      // Set defaults from session if API fails
       setProfile((prev) => ({
         ...prev,
         displayName: session?.user?.email?.split("@")[0] || "",
@@ -108,9 +94,9 @@ export default function ProfilePage() {
       console.error("Error loading page data:", error);
     }
   };
+
   const handleProfileChange = (name: string, value: string) => {
     setProfile((prev) => ({ ...prev, [name]: value }));
-    // Clear error for this field
     if (errors[name]) {
       const newErrors = { ...errors };
       delete newErrors[name];
@@ -134,9 +120,7 @@ export default function ProfilePage() {
         body: JSON.stringify(profile),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
+      if (!response.ok) throw new Error("Failed to update profile");
 
       toast({
         title: "Profile Updated",
@@ -169,9 +153,7 @@ export default function ProfilePage() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update page settings");
-      }
+      if (!response.ok) throw new Error("Failed to update page settings");
 
       toast({
         title: "Page Settings Updated",
@@ -191,12 +173,16 @@ export default function ProfilePage() {
 
   if (status === "loading") {
     return (
-      <div className="container mx-auto p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="h-96 bg-gray-200 rounded"></div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+      <div className="container py-4">
+        <div className="placeholder-glow">
+          <div className="placeholder col-3 mb-4" style={{ height: "2rem" }}></div>
+          <div className="row g-4">
+            <div className="col-md-6">
+              <div className="placeholder col-12" style={{ height: "400px", borderRadius: "1rem" }}></div>
+            </div>
+            <div className="col-md-6">
+              <div className="placeholder col-12" style={{ height: "400px", borderRadius: "1rem" }}></div>
+            </div>
           </div>
         </div>
       </div>
@@ -205,240 +191,347 @@ export default function ProfilePage() {
 
   if (!session) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p>Please sign in to access your profile.</p>
-          </CardContent>
-        </Card>
+      <div className="container py-4">
+        <div className="card border-0 shadow-sm rounded-4">
+          <div className="card-body p-4">
+            <p className="mb-0">Please sign in to access your profile.</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Profile Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your profile information and page settings.
-        </p>
-      </div>
+    <div className="row justify-content-center">
+      <div className="col-12 col-xl-10 col-xxl-8">
+        <div className="mb-4">
+          <h2 className="fw-bold" style={{ color: "var(--lh-dark)" }}>
+            Profile Settings
+          </h2>
+          <p className="text-muted mb-0">
+            Manage your profile information and page settings.
+          </p>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Profile Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your personal information that will be displayed on your
-              public page.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleProfileSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="displayName">Display Name *</Label>
-                <Input
-                  id="displayName"
-                  value={profile.displayName}
-                  onChange={(e) =>
-                    handleProfileChange("displayName", e.target.value)
-                  }
-                  placeholder="Your display name"
-                />
-                {errors.displayName && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.displayName[0]}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={profile.bio}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    handleProfileChange("bio", e.target.value)
-                  }
-                  placeholder="Tell us about yourself..."
-                  rows={3}
-                />
-                {errors.bio && (
-                  <p className="text-sm text-red-600 mt-1">{errors.bio[0]}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="profession">Profession</Label>
-                <Input
-                  id="profession"
-                  value={profile.profession}
-                  onChange={(e) =>
-                    handleProfileChange("profession", e.target.value)
-                  }
-                  placeholder="Your profession or title"
-                />
-                {errors.profession && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.profession[0]}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={profile.location}
-                  onChange={(e) =>
-                    handleProfileChange("location", e.target.value)
-                  }
-                  placeholder="Your location"
-                />
-                {errors.location && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.location[0]}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="websiteUrl">Website URL</Label>
-                <Input
-                  id="websiteUrl"
-                  type="url"
-                  value={profile.websiteUrl}
-                  onChange={(e) =>
-                    handleProfileChange("websiteUrl", e.target.value)
-                  }
-                  placeholder="https://your-website.com"
-                />
-                {errors.websiteUrl && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.websiteUrl[0]}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="profileImageUrl">Profile Image URL</Label>
-                <Input
-                  id="profileImageUrl"
-                  type="url"
-                  value={profile.profileImageUrl}
-                  onChange={(e) =>
-                    handleProfileChange("profileImageUrl", e.target.value)
-                  }
-                  placeholder="https://your-image-url.com/image.jpg"
-                />
-                {errors.profileImageUrl && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.profileImageUrl[0]}
-                  </p>
-                )}
-              </div>
-
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? "Updating..." : "Update Profile"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Page Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Page Settings</CardTitle>
-            <CardDescription>
-              Configure your public page settings and visibility.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePageSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="slug">Page URL</Label>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">
-                    {typeof window !== "undefined"
-                      ? window.location.origin
-                      : "http://localhost:3000"}
-                    /
-                  </span>
-                  <Input
-                    id="slug"
-                    value={pageSettings.slug}
-                    disabled
-                    className="bg-muted"
-                  />
+        <div className="row g-4">
+          {/* Profile Information */}
+          <div className="col-lg-6">
+            <div className="card border-0 shadow-sm rounded-4 h-100">
+              <div className="card-body p-4">
+                <div className="d-flex align-items-center mb-4">
+                  <div
+                    className="rounded-3 d-flex align-items-center justify-content-center me-3"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      background: "linear-gradient(135deg, #ede9fe, #ddd6fe)",
+                    }}
+                  >
+                    <i className="bi bi-person fs-5" style={{ color: "#7c3aed" }}></i>
+                  </div>
+                  <div>
+                    <h5 className="fw-bold mb-0">Profile Information</h5>
+                    <small className="text-muted">
+                      Displayed on your public page
+                    </small>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Your page URL cannot be changed after creation.
-                </p>
-              </div>
 
-              <div>
-                <Label htmlFor="title">Page Title</Label>
-                <Input
-                  id="title"
-                  value={pageSettings.title}
-                  onChange={(e) => handlePageChange("title", e.target.value)}
-                  placeholder="Your page title"
-                />
-              </div>
+                <form onSubmit={handleProfileSubmit}>
+                  <div className="mb-3">
+                    <label htmlFor="displayName" className="form-label fw-medium small">
+                      Display Name *
+                    </label>
+                    <input
+                      id="displayName"
+                      type="text"
+                      className={`form-control ${errors.displayName ? "is-invalid" : ""}`}
+                      value={profile.displayName}
+                      onChange={(e) =>
+                        handleProfileChange("displayName", e.target.value)
+                      }
+                      placeholder="Your display name"
+                    />
+                    {errors.displayName && (
+                      <div className="invalid-feedback">
+                        {errors.displayName[0]}
+                      </div>
+                    )}
+                  </div>
 
-              <div>
-                <Label htmlFor="description">Page Description</Label>
-                <Textarea
-                  id="description"
-                  value={pageSettings.description}
-                  onChange={(e) =>
-                    handlePageChange("description", e.target.value)
-                  }
-                  placeholder="Describe your page..."
-                  rows={3}
-                />
-              </div>
+                  <div className="mb-3">
+                    <label htmlFor="bio" className="form-label fw-medium small">
+                      Bio
+                    </label>
+                    <textarea
+                      id="bio"
+                      className={`form-control ${errors.bio ? "is-invalid" : ""}`}
+                      value={profile.bio}
+                      onChange={(e) =>
+                        handleProfileChange("bio", e.target.value)
+                      }
+                      placeholder="Tell us about yourself..."
+                      rows={3}
+                    />
+                    {errors.bio && (
+                      <div className="invalid-feedback">{errors.bio[0]}</div>
+                    )}
+                  </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="isPublic">Public Page</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Make your page visible to everyone
-                  </p>
+                  <div className="mb-3">
+                    <label htmlFor="profession" className="form-label fw-medium small">
+                      Profession
+                    </label>
+                    <input
+                      id="profession"
+                      type="text"
+                      className={`form-control ${errors.profession ? "is-invalid" : ""}`}
+                      value={profile.profession}
+                      onChange={(e) =>
+                        handleProfileChange("profession", e.target.value)
+                      }
+                      placeholder="Your profession or title"
+                    />
+                    {errors.profession && (
+                      <div className="invalid-feedback">
+                        {errors.profession[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="location" className="form-label fw-medium small">
+                      Location
+                    </label>
+                    <input
+                      id="location"
+                      type="text"
+                      className={`form-control ${errors.location ? "is-invalid" : ""}`}
+                      value={profile.location}
+                      onChange={(e) =>
+                        handleProfileChange("location", e.target.value)
+                      }
+                      placeholder="Your location"
+                    />
+                    {errors.location && (
+                      <div className="invalid-feedback">
+                        {errors.location[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="websiteUrl" className="form-label fw-medium small">
+                      Website URL
+                    </label>
+                    <input
+                      id="websiteUrl"
+                      type="url"
+                      className={`form-control ${errors.websiteUrl ? "is-invalid" : ""}`}
+                      value={profile.websiteUrl}
+                      onChange={(e) =>
+                        handleProfileChange("websiteUrl", e.target.value)
+                      }
+                      placeholder="https://your-website.com"
+                    />
+                    {errors.websiteUrl && (
+                      <div className="invalid-feedback">
+                        {errors.websiteUrl[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-4">
+                    <label htmlFor="profileImageUrl" className="form-label fw-medium small">
+                      Profile Image URL
+                    </label>
+                    <input
+                      id="profileImageUrl"
+                      type="url"
+                      className={`form-control ${errors.profileImageUrl ? "is-invalid" : ""}`}
+                      value={profile.profileImageUrl}
+                      onChange={(e) =>
+                        handleProfileChange("profileImageUrl", e.target.value)
+                      }
+                      placeholder="https://your-image-url.com/image.jpg"
+                    />
+                    {errors.profileImageUrl && (
+                      <div className="invalid-feedback">
+                        {errors.profileImageUrl[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary w-100 py-2 fw-semibold"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-check2 me-1"></i>
+                        Update Profile
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {/* Page Settings */}
+          <div className="col-lg-6">
+            <div className="card border-0 shadow-sm rounded-4 h-100">
+              <div className="card-body p-4">
+                <div className="d-flex align-items-center mb-4">
+                  <div
+                    className="rounded-3 d-flex align-items-center justify-content-center me-3"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      background: "linear-gradient(135deg, #dbeafe, #bfdbfe)",
+                    }}
+                  >
+                    <i className="bi bi-gear fs-5" style={{ color: "#2563eb" }}></i>
+                  </div>
+                  <div>
+                    <h5 className="fw-bold mb-0">Page Settings</h5>
+                    <small className="text-muted">
+                      Configure visibility and details
+                    </small>
+                  </div>
                 </div>
-                <Switch
-                  id="isPublic"
-                  checked={pageSettings.isPublic}
-                  onCheckedChange={(checked: boolean) =>
-                    handlePageChange("isPublic", checked)
-                  }
-                />
-              </div>
 
-              <Button type="submit" disabled={isLoadingPage} className="w-full">
-                {isLoadingPage ? "Updating..." : "Update Page Settings"}
-              </Button>
-            </form>
+                <form onSubmit={handlePageSubmit}>
+                  <div className="mb-3">
+                    <label htmlFor="slug" className="form-label fw-medium small">
+                      Page URL
+                    </label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light small">
+                        {typeof window !== "undefined"
+                          ? window.location.origin
+                          : "http://localhost:3000"}
+                        /
+                      </span>
+                      <input
+                        id="slug"
+                        type="text"
+                        className="form-control bg-light"
+                        value={pageSettings.slug}
+                        disabled
+                      />
+                    </div>
+                    <div className="form-text">
+                      <i className="bi bi-info-circle me-1"></i>
+                      Your page URL cannot be changed after creation.
+                    </div>
+                  </div>
 
-            {pageSettings.slug && (
-              <div className="mt-4 p-4 bg-muted rounded-lg">
-                <p className="text-sm font-medium">Your Public Page:</p>
-                <a
-                  href={`/${pageSettings.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline text-sm break-all"
-                >
-                  {typeof window !== "undefined"
-                    ? window.location.origin
-                    : "http://localhost:3000"}
-                  /{pageSettings.slug}
-                </a>
+                  <div className="mb-3">
+                    <label htmlFor="title" className="form-label fw-medium small">
+                      Page Title
+                    </label>
+                    <input
+                      id="title"
+                      type="text"
+                      className="form-control"
+                      value={pageSettings.title}
+                      onChange={(e) => handlePageChange("title", e.target.value)}
+                      placeholder="Your page title"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="description" className="form-label fw-medium small">
+                      Page Description
+                    </label>
+                    <textarea
+                      id="description"
+                      className="form-control"
+                      value={pageSettings.description}
+                      onChange={(e) =>
+                        handlePageChange("description", e.target.value)
+                      }
+                      placeholder="Describe your page..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="d-flex align-items-center justify-content-between mb-4 p-3 bg-light rounded-3">
+                    <div>
+                      <label
+                        htmlFor="isPublic"
+                        className="form-label fw-medium small mb-0"
+                      >
+                        Public Page
+                      </label>
+                      <p className="text-muted small mb-0">
+                        Make your page visible to everyone
+                      </p>
+                    </div>
+                    <div className="form-check form-switch mb-0">
+                      <input
+                        id="isPublic"
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        checked={pageSettings.isPublic}
+                        onChange={(e) =>
+                          handlePageChange("isPublic", e.target.checked)
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary w-100 py-2 fw-semibold"
+                    disabled={isLoadingPage}
+                  >
+                    {isLoadingPage ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-check2 me-1"></i>
+                        Update Page Settings
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {pageSettings.slug && (
+                  <div className="mt-4 p-3 bg-light rounded-3">
+                    <small className="fw-medium d-block mb-1">
+                      <i className="bi bi-globe me-1"></i>Your Public Page:
+                    </small>
+                    <a
+                      href={`/${pageSettings.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="small text-break fw-semibold text-decoration-none"
+                      style={{ color: "var(--lh-primary)" }}
+                    >
+                      {typeof window !== "undefined"
+                        ? window.location.origin
+                        : "http://localhost:3000"}
+                      /{pageSettings.slug}{" "}
+                      <i className="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

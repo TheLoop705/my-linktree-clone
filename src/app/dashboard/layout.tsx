@@ -4,14 +4,6 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  Settings,
-  User,
-  LogOut,
-  Link as LinkIcon,
-} from "lucide-react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -22,98 +14,101 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") return; // Do nothing while loading
+    if (status === "loading") return;
     if (!session) {
-      router.push("/login"); // Redirect to login if not authenticated
+      router.push("/login");
     }
   }, [session, status, router]);
 
   if (status === "loading" || !session) {
-    // You can render a loading spinner here or null
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="d-flex align-items-center justify-content-center vh-100">
+        <div className="spinner-border spinner-linkhub" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
       </div>
     );
   }
 
-  // If session exists, render the children (the dashboard page)
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <LinkIcon className="h-8 w-8 text-blue-600 mr-2" />
-                <h1 className="text-2xl font-bold text-gray-900">LinkHub</h1>
-              </Link>
-            </div>
+    <div className="dashboard-body">
+      {/* Dashboard Navbar */}
+      <nav className="navbar navbar-expand-lg dashboard-navbar sticky-top py-2">
+        <div className="container-fluid px-3 px-lg-5">
+          <Link
+            href="/"
+            className="navbar-brand d-flex align-items-center text-decoration-none"
+          >
+            <i
+              className="bi bi-link-45deg fs-3 me-2"
+              style={{ color: "var(--lh-primary)" }}
+            ></i>
+            <span className="fw-bold fs-5" style={{ color: "var(--lh-dark)" }}>
+              LinkHub
+            </span>
+          </Link>
 
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link
-                href="/dashboard"
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Dashboard
-              </Link>
-              <Link
-                href="/dashboard/profile"
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Link>
-            </nav>
+          <button
+            className="navbar-toggler border-0"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#dashboardNav"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <User className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">
+          <div className="collapse navbar-collapse" id="dashboardNav">
+            <ul className="navbar-nav me-auto ms-4">
+              <li className="nav-item">
+                <Link
+                  href="/dashboard"
+                  className="nav-link d-flex align-items-center fw-medium"
+                >
+                  <i className="bi bi-grid-1x2 me-2"></i>
+                  Dashboard
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  href="/dashboard/profile"
+                  className="nav-link d-flex align-items-center fw-medium"
+                >
+                  <i className="bi bi-gear me-2"></i>
+                  Settings
+                </Link>
+              </li>
+            </ul>
+
+            <div className="d-flex align-items-center gap-3">
+              <div className="d-flex align-items-center">
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center me-2"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    background: "var(--lh-gradient)",
+                  }}
+                >
+                  <i className="bi bi-person-fill text-white small"></i>
+                </div>
+                <span className="text-muted small d-none d-md-inline">
                   {session.user?.email}
                 </span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
+                className="btn btn-outline-secondary btn-sm d-flex align-items-center"
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex items-center"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <i className="bi bi-box-arrow-right me-1"></i>
                 Sign Out
-              </Button>
+              </button>
             </div>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-6 py-2">
-            <Link
-              href="/dashboard"
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm"
-            >
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              Dashboard
-            </Link>
-            <Link
-              href="/dashboard/profile"
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
+      {/* Main Content */}
+      <main className="container-fluid px-3 px-lg-5 py-4">{children}</main>
     </div>
   );
 }
