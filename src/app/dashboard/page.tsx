@@ -1,7 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Icon } from "@/components/design/Icon";
 
@@ -12,21 +11,30 @@ interface LinkItem {
   description?: string;
   isActive: boolean;
   position: number;
-  clicks?: number;
-  color?: string;
+  clicks: number;
+  color: string;
 }
 
 interface UserPage {
   id: string;
   slug: string;
-  title?: string;
-  description?: string;
-  isPublic: boolean;
-  theme?: {
-    themeName?: string;
-  };
+  title: string;
   links: LinkItem[];
 }
+
+const COLORS = ["#6366f1", "#ec4899", "#06b6d4", "#0b0b12", "#f59e0b", "#10b981"];
+
+const INITIAL_PAGE: UserPage = {
+  id: "demo",
+  slug: "you",
+  title: "Your Hub",
+  links: [
+    { id: "1", title: "Portfolio", url: "https://example.com/portfolio", isActive: true, position: 0, clicks: 1243, color: "#6366f1" },
+    { id: "2", title: "Latest collection", url: "https://example.com/shop", isActive: true, position: 1, clicks: 892, color: "#ec4899" },
+    { id: "3", title: "Book a call", url: "https://cal.com/demo", isActive: true, position: 2, clicks: 412, color: "#06b6d4" },
+    { id: "4", title: "Instagram", url: "https://instagram.com/demo", isActive: false, position: 3, clicks: 76, color: "#0b0b12" },
+  ],
+};
 
 const SparkSvg = () => (
   <svg preserveAspectRatio="none" viewBox="0 0 100 20">
@@ -39,16 +47,8 @@ const SparkSvg = () => (
   </svg>
 );
 
-function DashPreview({
-  userPage,
-}: {
-  userPage: UserPage | null;
-}) {
-  if (!userPage) return null;
-
-  const email = userPage.slug || "you";
-  const initial = (email[0] ?? "U").toUpperCase();
-  const displayName = userPage.title || email;
+function DashPreview({ userPage }: { userPage: UserPage }) {
+  const initial = userPage.title[0]?.toUpperCase() ?? "Y";
   const activeLinks = userPage.links.filter((l) => l.isActive);
 
   return (
@@ -67,7 +67,7 @@ function DashPreview({
       <div className="dash-preview__phone">
         <div className="screen">
           <div className="avatar">{initial}</div>
-          <div className="name">{displayName}</div>
+          <div className="name">{userPage.title}</div>
           <div className="role">Your link page</div>
           <div className="links">
             {activeLinks.slice(0, 6).map((l) => (
@@ -75,8 +75,8 @@ function DashPreview({
                 <div
                   className="emoji"
                   style={{
-                    background: (l.color || "#6366f1") + "22",
-                    color: l.color || "#6366f1",
+                    background: l.color + "22",
+                    color: l.color,
                   }}
                 >
                   🔗
@@ -98,10 +98,8 @@ function DashPreview({
 }
 
 export default function Dashboard() {
-  const { data: session } = useSession();
   const { toast } = useToast();
-  const [userPage, setUserPage] = useState<UserPage | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [userPage, setUserPage] = useState<UserPage>(INITIAL_PAGE);
   const [isAddingLink, setIsAddingLink] = useState(false);
   const [newLink, setNewLink] = useState({
     title: "",
@@ -109,180 +107,51 @@ export default function Dashboard() {
     description: "",
   });
 
-  useEffect(() => {
-    fetchUserPage();
-  }, []);
-
-  const fetchUserPage = async () => {
-    try {
-      const response = await fetch("/api/pages/my-page");
-      if (response.ok) {
-        const data = await response.json();
-        setUserPage(data);
-      } else {
-        await createDefaultPage();
-      }
-    } catch (error) {
-      console.error("Error fetching user page:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load your page. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createDefaultPage = async () => {
-    try {
-      const response = await fetch("/api/pages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          slug: `${session?.user?.email?.split("@")[0] || "user"}-${Date.now()}`,
-          title: `${session?.user?.email}'s Links`,
-          description: "Welcome to my LinkHub page!",
-          isPublic: true,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUserPage(data);
-        toast({
-          title: "Welcome!",
-          description: "Your LinkHub page has been created.",
-        });
-      }
-    } catch (error) {
-      console.error("Error creating default page:", error);
-    }
-  };
-
-  const addLink = async () => {
+  const addLink = () => {
     if (!newLink.title || !newLink.url) {
       toast({
-        title: "Error",
+        title: "Missing info",
         description: "Please fill in both title and URL.",
         variant: "destructive",
       });
       return;
     }
 
-    try {
-      const response = await fetch("/api/links", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageId: userPage?.id,
-          ...newLink,
-          position: userPage?.links?.length || 0,
-        }),
-      });
+    const link: LinkItem = {
+      id: Date.now().toString(),
+      title: newLink.title,
+      url: newLink.url,
+      description: newLink.description || undefined,
+      isActive: true,
+      position: userPage.links.length,
+      clicks: 0,
+      color: COLORS[userPage.links.length % COLORS.length],
+    };
 
-      if (response.ok) {
-        const linkData = await response.json();
-        setUserPage((prev) =>
-          prev ? { ...prev, links: [...prev.links, linkData] } : null
-        );
-        setNewLink({ title: "", url: "", description: "" });
-        setIsAddingLink(false);
-        toast({ title: "Success", description: "Link added successfully!" });
-      } else {
-        throw new Error("Failed to add link");
-      }
-    } catch (error) {
-      console.error("Error adding link:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add link. Please try again.",
-        variant: "destructive",
-      });
-    }
+    setUserPage((prev) => ({ ...prev, links: [...prev.links, link] }));
+    setNewLink({ title: "", url: "", description: "" });
+    setIsAddingLink(false);
+    toast({ title: "Link added", description: "Your new link is live." });
   };
 
-  const deleteLink = async (linkId: string) => {
-    try {
-      const response = await fetch(`/api/links/${linkId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setUserPage((prev) =>
-          prev
-            ? { ...prev, links: prev.links.filter((l) => l.id !== linkId) }
-            : null
-        );
-        toast({ title: "Success", description: "Link deleted successfully!" });
-      } else {
-        throw new Error("Failed to delete link");
-      }
-    } catch (error) {
-      console.error("Error deleting link:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete link. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const deleteLink = (linkId: string) => {
+    setUserPage((prev) => ({
+      ...prev,
+      links: prev.links.filter((l) => l.id !== linkId),
+    }));
+    toast({ title: "Link deleted" });
   };
 
-  const toggleLinkStatus = async (linkId: string, isActive: boolean) => {
-    try {
-      const response = await fetch(`/api/links/${linkId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive }),
-      });
-
-      if (response.ok) {
-        setUserPage((prev) =>
-          prev
-            ? {
-                ...prev,
-                links: prev.links.map((link) =>
-                  link.id === linkId ? { ...link, isActive } : link
-                ),
-              }
-            : null
-        );
-      } else {
-        throw new Error("Failed to update link");
-      }
-    } catch (error) {
-      console.error("Error updating link:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update link. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const toggleLinkStatus = (linkId: string, isActive: boolean) => {
+    setUserPage((prev) => ({
+      ...prev,
+      links: prev.links.map((link) =>
+        link.id === linkId ? { ...link, isActive } : link
+      ),
+    }));
   };
 
-  if (loading) {
-    return (
-      <div className="dash-main">
-        <div className="dash-main__left">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: 400,
-              color: "var(--text-2)",
-              fontSize: 14,
-            }}
-          >
-            Loading your dashboard...
-          </div>
-        </div>
-        <div className="dash-main__right" />
-      </div>
-    );
-  }
-
-  const links = userPage?.links ?? [];
+  const links = userPage.links;
 
   return (
     <div className="dash-main">
@@ -437,8 +306,8 @@ export default function Dashboard() {
                   <div
                     className="emoji"
                     style={{
-                      background: (l.color || "#6366f1") + "22",
-                      color: l.color || "#6366f1",
+                      background: l.color + "22",
+                      color: l.color,
                     }}
                   >
                     🔗
@@ -449,9 +318,7 @@ export default function Dashboard() {
                   </div>
                   <div className="clicks">
                     <Icon.ArrowUp size={11} />{" "}
-                    <span className="mono">
-                      {(l.clicks ?? 0).toLocaleString()}
-                    </span>
+                    <span className="mono">{l.clicks.toLocaleString()}</span>
                   </div>
                   <button
                     type="button"

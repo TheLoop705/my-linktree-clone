@@ -1,6 +1,0 @@
-/*
- * Intentionally empty.
- * All LinkHub styles live in src/styles/main.scss and are imported from
- * src/app/layout.tsx. Leaving this file in place avoids editor/linter noise
- * for tooling that still references the old path.
- */

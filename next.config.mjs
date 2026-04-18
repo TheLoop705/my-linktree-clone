@@ -1,43 +1,17 @@
 /** @type {import('next').NextConfig} */
+const isGhPages = process.env.GITHUB_PAGES === "true";
+const repoName = "my-linktree-clone";
+
 const nextConfig = {
+  output: "export",
   reactStrictMode: true,
   swcMinify: true,
+  trailingSlash: true,
   images: {
-    domains: [
-      "localhost",
-      "linkhub-storage.s3.amazonaws.com",
-      "images.unsplash.com",
-    ],
-    formats: ["image/avif", "image/webp"],
+    unoptimized: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ["@prisma/client"],
-  },
-  headers: async () => {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
-          {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-        ],
-      },
-    ];
-  },
+  basePath: isGhPages ? `/${repoName}` : "",
+  assetPrefix: isGhPages ? `/${repoName}/` : "",
 };
 
 export default nextConfig;

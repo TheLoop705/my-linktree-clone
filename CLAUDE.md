@@ -2,109 +2,88 @@
 
 ## Project Overview
 
-**LinkHub** (my-linktree-clone) is a Linktree-style link-in-bio app with NFC wristband pairing. Built with Next.js 14 (App Router), Prisma, NextAuth, and a custom SCSS design system.
+**LinkHub** is a **static demo/portfolio showcase** of a Linktree-style link-in-bio app with NFC wristband UX. It's fully static (no backend, no database, no auth) and deploys to GitHub Pages.
+
+Live demo (once Pages is enabled): `https://theloop705.github.io/my-linktree-clone/`
+
+## What This Is / Isn't
+
+- **Is:** A fully static Next.js showcase site — marketing page, auth mockups, dashboard UI, NFC pairing wizard, public profile themes.
+- **Isn't:** A real product. No database, no authentication, no API, no persistence. Forms just navigate; dashboard edits live in React state only.
 
 ## Tech Stack
 
-- **Framework:** Next.js 14 (App Router, `src/app/`)
-- **Auth:** NextAuth with credentials provider
-- **Database:** Prisma ORM (SQLite in dev)
+- **Framework:** Next.js 14 (App Router, `output: 'export'` — static export)
 - **Styling:** Custom SCSS design system (`src/styles/`) — no Bootstrap, no Tailwind
 - **Components:** Custom design components in `src/components/design/`
+- **Toast:** Radix UI toast (`@radix-ui/react-toast`) with custom SCSS
+- **Deployment:** GitHub Pages via GitHub Actions (`.github/workflows/deploy.yml`)
 
-## Architecture
+## Static Export Configuration
 
-### Design System (custom, no framework)
-- **Tokens:** `src/styles/_tokens.scss` — CSS custom properties for colors, spacing, typography
-- **Base:** `src/styles/_base.scss` — reset and body defaults
-- **Components:** `src/styles/components/` — buttons, forms, toggle, logo, NFC band, atoms
-- **Pages:** `src/styles/pages/` — marketing, auth, dashboard, profile, NFC
-- **Entry:** `src/styles/main.scss` — imports everything, imported in `layout.tsx`
+`next.config.mjs` uses `output: 'export'`. When env var `GITHUB_PAGES=true`, the build sets `basePath` and `assetPrefix` to `/my-linktree-clone` (the repo name). Locally, no basePath is set.
 
-### Design Components
-- `src/components/design/Icon.tsx` — SVG icon system (Icon.Plus, Icon.Check, Icon.Arrow, etc.)
-- `src/components/design/Logo.tsx` — LinkHub logo with optional label color
-- `src/components/design/NFCBand.tsx` — NFC wristband visual (size, glow, floating props)
-- `src/components/design/MobileStatus.tsx` — phone status bar for previews
+## Routes (all statically generated)
 
-### Page Structure
-- `/` — Marketing landing page (marketing nav, hero, features, pricing, footer)
-- `/login` — Login with split-screen auth layout
-- `/register` — Register with split-screen auth layout
-- `/dashboard` — Links management + live preview (sidebar from layout)
-- `/dashboard/profile` — Profile & page settings
-- `/dashboard/nfc` — NFC wristband pairing wizard (5-step flow)
-- `/[slug]` — Public profile page (server component, 4 themes: default/dark/gradient/minimal)
+- `/` — Marketing landing page
+- `/login` — Login mockup (submits → redirects to `/dashboard`)
+- `/register` — Register mockup (submits → redirects to `/dashboard`)
+- `/dashboard` — Links management + live preview (all client state, no persistence)
+- `/dashboard/profile` — Profile/page settings (mock save)
+- `/dashboard/nfc` — NFC wristband pairing wizard (5 steps)
+- `/[slug]` — Public profile pages. Pre-rendered with `generateStaticParams` for: `demo`, `jordan`, `lena`, `you` (each demos a different theme).
 
-### API Routes
-- `/api/auth/[...nextauth]` — NextAuth
-- `/api/auth/register` — User registration
-- `/api/pages`, `/api/pages/[pageId]`, `/api/pages/my-page` — Page CRUD
-- `/api/links`, `/api/links/[linkId]` — Link CRUD
-- `/api/profile` — Profile GET/PUT
+## Design System
 
-### CSS Naming Convention
+### SCSS Structure
+- `_tokens.scss` — CSS custom properties for colors, spacing, typography
+- `_base.scss` — reset and body defaults
+- `components/` — buttons, forms, toggle, logo, NFC band, atoms, toast
+- `pages/` — marketing, auth, dashboard, profile, NFC
+- `main.scss` — imports everything; imported in `src/app/layout.tsx`
+
+### Design Components (`src/components/design/`)
+- `Icon.tsx` — SVG icon set (Plus, Check, Arrow, Link, Chart, Paint, Gear, NFC, Globe, Pin, Grip, Eye, Copy, Sparkle, Trash, External)
+- `Logo.tsx` — LinkHub logo
+- `NFCBand.tsx` — Animated NFC wristband visual
+- `MobileStatus.tsx` — Phone status bar for mockups
+
+### CSS Conventions
 - BEM: `.block__element--modifier`
-- Data attributes for state: `data-theme`, `data-on`, `data-inactive`, `data-hidden`, `aria-pressed`
-- Utility classes: `.mono` (monospace), `.chip` (pill badge), `.gradient-text`
+- Data attributes for state: `data-theme`, `data-on`, `data-inactive`, `data-selected`, `aria-pressed`
 - Button classes: `.btn`, `.btn-primary`, `.btn-ghost`, `.btn-gradient`, `.btn-white`, `.btn-glass`
 - Form classes: `.field`, `.label`, `.input`, `.input-inline-prefix`
+- Utility classes: `.mono`, `.chip`, `.gradient-text`
 
-### Important Patterns
-- Dashboard layout (`layout.tsx`) wraps all `/dashboard/*` routes with sidebar
-- Dashboard pages render `.dash-main > .dash-main__left + .dash-main__right`
-- Auth pages use split-screen: `.auth > .auth-left + .auth-right`
-- Public profile uses `data-theme` attribute for theme switching
+## Deployment
 
-## What Was Done (Session Summary)
+GitHub Actions workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
+1. Installs deps
+2. Builds with `GITHUB_PAGES=true` (applies basePath)
+3. Adds `.nojekyll` to `out/`
+4. Uploads and deploys to Pages
 
-### Complete Frontend Redesign (Bootstrap → Custom Design System)
+To enable: in repo **Settings → Pages**, set "Build and deployment" source to **GitHub Actions**.
 
-1. **Created design system from scratch:**
-   - Design tokens (colors, spacing, radii, typography as CSS custom properties)
-   - Base styles, animations, component SCSS (buttons, forms, toggles, logo, NFC band)
-   - Page-specific SCSS (marketing, auth, dashboard, profile, NFC)
+## Session History
 
-2. **Created shared design components:**
-   - `Icon.tsx` — Full SVG icon set (16 icons)
-   - `Logo.tsx` — Branded logo component
-   - `NFCBand.tsx` — NFC wristband visual with glow/floating effects
-   - `MobileStatus.tsx` — Phone status bar for preview mockups
+### Session 1: Frontend Bootstrap Redesign
+Rebuilt the entire UI from Bootstrap to a custom SCSS design system. Created the Icon/Logo/NFCBand components. Rebuilt marketing, login, register, dashboard, profile, public profile pages. Created the NFC setup wizard.
 
-3. **Rebuilt all pages:**
-   - **Marketing page** (`/`) — Nav, hero with phone mockup, logo strip, features, how-it-works, testimonials, pricing tiers, CTA band, footer
-   - **Login page** (`/login`) — Split-screen with testimonial left panel, social auth buttons, email form
-   - **Register page** (`/register`) — Same layout with handle field, password confirm, validation errors
-   - **Dashboard layout** — Sidebar with nav, account info, upgrade CTA, sign-out button
-   - **Dashboard page** (`/dashboard`) — Stats cards, links list with toggles, add-link form, NFC devices block, live phone preview
-   - **Profile page** (`/dashboard/profile`) — Profile info form + page settings form with toggle
-   - **Public profile** (`/[slug]`) — Theme-aware (4 themes), avatar, meta, link cards, footer
-   - **NFC setup** (`/dashboard/nfc`) — 5-step wizard (welcome, band picker, tap-to-pair, name, done with confetti)
+### Session 2: Strip to Static Demo
+Removed Prisma, NextAuth, API routes, tests, editor route, and all database-backed code. Converted pages to use mock/local-state data. Configured Next.js for static export. Added GitHub Actions Pages deployment workflow. Slimmed `package.json` from ~50 deps to ~10.
 
-4. **Removed Bootstrap dependency** — deleted `BootstrapClient.tsx`, stripped Bootstrap class names from all pages
+## Local Development
 
-5. **Design plans preserved** in `docs/plans/` (00-shared through 05-nfc) for reference
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # static export to out/
+```
 
-## Next Session — Potential Work
+## Potential Future Work
 
-### Polish & Testing
-- [ ] Start the dev server and visually test each page in browser
-- [ ] Test responsive breakpoints (mobile, tablet, desktop)
-- [ ] Test dark theme on public profile page
-- [ ] Test all dashboard CRUD operations (add/delete/toggle links, save profile)
-- [ ] Test auth flow (register → login → dashboard)
-
-### Feature Gaps
-- [ ] Theme selector on dashboard page currently uses old Bootstrap code — was removed; could re-add as custom component
-- [ ] Drag-to-reorder links (currently visual only, no DnD library)
-- [ ] NFC page is UI-only — no actual NFC pairing backend
-- [ ] Social auth buttons (Google/Apple) are visual-only — no OAuth providers configured
-- [ ] Analytics stats are hardcoded — no real analytics backend
-- [ ] Preview "Mobile/Desktop" toggle is non-functional
-- [ ] Copy URL button is non-functional
-
-### Code Quality
-- [ ] Run `npx next lint` and fix any issues
-- [ ] Consider extracting DashPreview as a shared component if profile page needs it
-- [ ] Add proper TypeScript types for API responses
-- [ ] Remove `docs/plans/` if no longer needed (they're implementation reference docs)
+- Wire up localStorage persistence for dashboard/profile state so demo edits survive refresh
+- Add more demo slugs with different theme examples
+- Polish mobile responsive breakpoints
+- Add a subtle "Demo mode" banner on dashboard so visitors know what this is

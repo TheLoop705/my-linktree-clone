@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { useState, FormEvent, ChangeEvent } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { Icon } from "@/components/design/Icon";
 import { Logo } from "@/components/design/Logo";
 import { NFCBand } from "@/components/design/NFCBand";
@@ -88,60 +86,11 @@ function SocialBtn({ provider }: { provider: "Google" | "Apple" }) {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { toast } = useToast();
 
-  const handleSubmit = async (event: FormEvent) => {
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      });
-
-      if (result?.error) {
-        const errorMessage =
-          result.error === "CredentialsSignin"
-            ? "Invalid email or password."
-            : result.error;
-        setError(errorMessage);
-        toast({
-          title: "Login Failed",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        setIsLoading(false);
-      } else if (result?.ok) {
-        toast({
-          title: "Login Successful",
-          description: "You are now logged in.",
-        });
-        router.push("/");
-      } else {
-        setError("An unexpected error occurred during login.");
-        toast({
-          title: "Login Error",
-          description: "An unexpected error occurred.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-      }
-    } catch (err) {
-      console.error("Login submit error", err);
-      setError("An unexpected error occurred.");
-      toast({
-        title: "Login Error",
-        description: "An unexpected error occurred.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-    }
+    router.push("/dashboard");
   };
 
   return (
@@ -185,8 +134,6 @@ export default function LoginPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setEmail(e.target.value)
                 }
-                required
-                disabled={isLoading}
               />
             </div>
 
@@ -206,32 +153,15 @@ export default function LoginPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setPassword(e.target.value)
                 }
-                required
-                disabled={isLoading}
               />
             </div>
-
-            {error && (
-              <div
-                style={{
-                  color: "#ef4444",
-                  fontSize: 12,
-                  marginTop: 4,
-                  marginBottom: 12,
-                }}
-              >
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
               className="btn btn-gradient"
               style={{ width: "100%", padding: "13px 18px" }}
-              disabled={isLoading}
             >
-              {isLoading ? "Signing in…" : "Sign in"}{" "}
-              <Icon.Arrow size={14} />
+              Sign in <Icon.Arrow size={14} />
             </button>
           </form>
 
@@ -242,7 +172,7 @@ export default function LoginPage() {
         </div>
 
         <div className="auth-right__footer mono">
-          🔒 SOC 2 Type II · Data encrypted end-to-end
+          🔒 Demo mode · No real sign-in required
         </div>
       </section>
     </div>
