@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "@/styles/main.scss";
-import SessionProviderWrapper from "@/components/providers/SessionProviderWrapper";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
@@ -17,10 +16,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProviderWrapper>
-          {children}
-          <Toaster />
-        </SessionProviderWrapper>
+        {children}
+        <Toaster />
       </body>
     </html>
   );

@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { Logo } from "@/components/design/Logo";
 import { Icon } from "@/components/design/Icon";
@@ -12,38 +11,12 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (status === "loading") return;
-    if (!session) {
-      router.push("/login");
-    }
-  }, [session, status, router]);
-
-  if (status === "loading" || !session) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "var(--bg)",
-          color: "var(--text-2)",
-          fontSize: 14,
-        }}
-      >
-        Loading…
-      </div>
-    );
-  }
-
-  const email = session.user?.email ?? "";
-  const initial = (email[0] ?? "U").toUpperCase();
-  const slug = email ? email.split("@")[0] : "you";
+  const email = "demo@linkhub.to";
+  const initial = "D";
+  const slug = "you";
 
   const isLinksActive = pathname === "/dashboard";
   const isProfileActive = pathname === "/dashboard/profile";
@@ -61,7 +34,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="avatar">{initial}</div>
             <div className="info">
               <div className="name">Your Hub</div>
-              <div className="url mono">linkhub.to/{slug || "you"}</div>
+              <div className="url mono">linkhub.to/{slug}</div>
             </div>
           </div>
         </div>
@@ -176,7 +149,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             type="button"
             className="btn btn-ghost"
             style={{ fontSize: 12, padding: "6px 10px" }}
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => router.push("/")}
           >
             Sign out
           </button>

@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Icon } from "@/components/design/Icon";
 
 interface UserProfileData {
   displayName: string;
@@ -15,7 +13,6 @@ interface UserProfileData {
 }
 
 interface PageData {
-  id: string;
   slug: string;
   title: string;
   description: string;
@@ -23,77 +20,26 @@ interface PageData {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
   const { toast } = useToast();
 
   const [profile, setProfile] = useState<UserProfileData>({
-    displayName: "",
-    bio: "",
-    profession: "",
-    location: "",
-    websiteUrl: "",
+    displayName: "Maya Okafor",
+    bio: "Designing calmer software. Currently building tools for small creative studios.",
+    profession: "Product Designer",
+    location: "Brooklyn, NY",
+    websiteUrl: "https://mayaokafor.com",
     profileImageUrl: "",
   });
 
   const [pageSettings, setPageSettings] = useState<PageData>({
-    id: "",
-    slug: "",
-    title: "",
-    description: "",
+    slug: "you",
+    title: "Your Hub",
+    description: "A curated list of my work and current projects.",
     isPublic: true,
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-
-  useEffect(() => {
-    if (session?.user) {
-      loadProfileData();
-      loadPageData();
-    }
-  }, [session]);
-
-  const loadProfileData = async () => {
-    try {
-      const response = await fetch("/api/profile");
-      if (!response.ok) throw new Error("Failed to load profile");
-
-      const data = await response.json();
-      setProfile({
-        displayName:
-          data.displayName || session?.user?.email?.split("@")[0] || "",
-        bio: data.bio || "",
-        profession: data.profession || "",
-        location: data.location || "",
-        websiteUrl: data.websiteUrl || "",
-        profileImageUrl: data.profileImageUrl || "",
-      });
-    } catch (error) {
-      console.error("Error loading profile:", error);
-      setProfile((prev) => ({
-        ...prev,
-        displayName: session?.user?.email?.split("@")[0] || "",
-      }));
-    }
-  };
-
-  const loadPageData = async () => {
-    try {
-      const response = await fetch("/api/pages/my-page");
-      if (!response.ok) throw new Error("Failed to load page data");
-
-      const data = await response.json();
-      setPageSettings({
-        id: data.id,
-        slug: data.slug,
-        title: data.title,
-        description: data.description || "",
-        isPublic: data.isPublic,
-      });
-    } catch (error) {
-      console.error("Error loading page data:", error);
-    }
-  };
 
   const handleProfileChange = (name: string, value: string) => {
     setProfile((prev) => ({ ...prev, [name]: value }));
@@ -103,102 +49,29 @@ export default function ProfilePage() {
     setPageSettings((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
+  const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile),
-      });
-
-      if (!response.ok) throw new Error("Failed to update profile");
-
+    setTimeout(() => {
+      setIsLoading(false);
       toast({
         title: "Profile Updated",
-        description: "Your profile has been updated successfully.",
+        description: "Your profile has been saved (demo mode).",
       });
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    }, 500);
   };
 
-  const handlePageSubmit = async (e: React.FormEvent) => {
+  const handlePageSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoadingPage(true);
-
-    try {
-      const response = await fetch(`/api/pages/${pageSettings.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: pageSettings.title,
-          description: pageSettings.description,
-          isPublic: pageSettings.isPublic,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to update page settings");
-
+    setTimeout(() => {
+      setIsLoadingPage(false);
       toast({
         title: "Page Settings Updated",
-        description: "Your page settings have been updated successfully.",
+        description: "Your page settings have been saved (demo mode).",
       });
-    } catch (error) {
-      console.error("Error updating page settings:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update page settings. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingPage(false);
-    }
+    }, 500);
   };
-
-  if (status === "loading") {
-    return (
-      <div className="dash-main">
-        <div className="dash-main__left">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: 400,
-              color: "var(--text-2)",
-              fontSize: 14,
-            }}
-          >
-            Loading...
-          </div>
-        </div>
-        <div className="dash-main__right" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="dash-main">
-        <div className="dash-main__left">
-          <div className="card" style={{ padding: 24 }}>
-            <p style={{ margin: 0 }}>Please sign in to access your profile.</p>
-          </div>
-        </div>
-        <div className="dash-main__right" />
-      </div>
-    );
-  }
 
   return (
     <div className="dash-main">
@@ -336,7 +209,7 @@ export default function ProfilePage() {
                   className="input"
                   id="slug"
                   value={pageSettings.slug}
-                  disabled
+                  onChange={(e) => handlePageChange("slug", e.target.value)}
                 />
               </div>
             </div>

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, FormEvent, ChangeEvent } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { Icon } from "@/components/design/Icon";
 import { Logo } from "@/components/design/Logo";
 import { NFCBand } from "@/components/design/NFCBand";
@@ -89,73 +88,12 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string[] }>(
-    {}
-  );
   const router = useRouter();
-  const { toast } = useToast();
 
-  const handleSubmit = async (event: FormEvent) => {
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    setFieldErrors({});
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: "Registration Successful",
-          description:
-            data.message || "Please check your email to verify your account.",
-        });
-        router.push("/login");
-      } else {
-        if (data.errors) {
-          setFieldErrors(data.errors);
-          setError(data.message || "Please fix the validation errors");
-        } else {
-          setError(data.message || "Registration failed");
-        }
-
-        toast({
-          title: "Registration Failed",
-          description: data.message || "Registration failed",
-          variant: "destructive",
-        });
-      }
-    } catch (err) {
-      console.error("Registration error", err);
-      setError("An unexpected error occurred");
-      setFieldErrors({});
-      toast({
-        title: "Registration Error",
-        description: "An unexpected error occurred.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    router.push("/dashboard");
   };
-
-  const errStyle = { color: "#ef4444", fontSize: 12, marginTop: 4 };
 
   return (
     <div className="auth">
@@ -196,7 +134,6 @@ export default function RegisterPage() {
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     setHandle(e.target.value)
                   }
-                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -214,16 +151,7 @@ export default function RegisterPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setEmail(e.target.value)
                 }
-                required
-                disabled={isLoading}
               />
-              {fieldErrors.email && (
-                <div style={errStyle}>
-                  {fieldErrors.email.map((err, index) => (
-                    <div key={index}>{err}</div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div className="field">
@@ -239,16 +167,7 @@ export default function RegisterPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setPassword(e.target.value)
                 }
-                required
-                disabled={isLoading}
               />
-              {fieldErrors.password && (
-                <div style={errStyle}>
-                  {fieldErrors.password.map((err, index) => (
-                    <div key={index}>{err}</div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div className="field field--lg">
@@ -264,23 +183,15 @@ export default function RegisterPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setConfirmPassword(e.target.value)
                 }
-                required
-                disabled={isLoading}
               />
             </div>
-
-            {error && (
-              <div style={{ ...errStyle, marginBottom: 12 }}>{error}</div>
-            )}
 
             <button
               type="submit"
               className="btn btn-gradient"
               style={{ width: "100%", padding: "13px 18px" }}
-              disabled={isLoading}
             >
-              {isLoading ? "Creating account…" : "Create account"}{" "}
-              <Icon.Arrow size={14} />
+              Create account <Icon.Arrow size={14} />
             </button>
           </form>
 
@@ -291,7 +202,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="auth-right__footer mono">
-          🔒 SOC 2 Type II · Data encrypted end-to-end
+          🔒 Demo mode · No real sign-up required
         </div>
       </section>
     </div>

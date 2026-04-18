@@ -1,70 +1,87 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { prisma } from "@/lib/db/prisma";
+import { notFound } from "next/navigation";
 import { Icon } from "@/components/design/Icon";
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
+interface MockProfile {
+  themeName: "default" | "dark" | "gradient" | "minimal";
+  displayName: string;
+  profession?: string;
+  location?: string;
+  bio?: string;
+  avatarInitial: string;
+  links: { id: string; title: string; url: string; description?: string }[];
 }
 
-async function getPageData(slug: string) {
-  try {
-    const page = await prisma.linkPage.findUnique({
-      where: {
-        slug,
-        isPublic: true,
-      },
-      include: {
-        links: {
-          where: { isActive: true },
-          orderBy: { position: "asc" },
-        },
-        user: {
-          include: {
-            profile: true,
-          },
-        },
-        theme: true,
-      },
-    });
+const MOCK_PROFILES: Record<string, MockProfile> = {
+  demo: {
+    themeName: "default",
+    displayName: "Maya Okafor",
+    profession: "Product Designer",
+    location: "Brooklyn, NY",
+    bio: "Designing calmer software. Currently building tools for small creative studios.",
+    avatarInitial: "M",
+    links: [
+      { id: "1", title: "Portfolio", url: "#", description: "Selected work 2020—2026" },
+      { id: "2", title: "Latest collection", url: "#", description: "New drop — limited run" },
+      { id: "3", title: "Book a call", url: "#", description: "30-min intro, free" },
+      { id: "4", title: "Instagram", url: "#" },
+      { id: "5", title: "Newsletter", url: "#", description: "Weekly, no fluff" },
+    ],
+  },
+  jordan: {
+    themeName: "dark",
+    displayName: "Jordan Reyes",
+    profession: "Founder · Helix Studio",
+    location: "Austin, TX",
+    bio: "I stopped carrying business cards two months ago. Every new contact starts with a tap.",
+    avatarInitial: "J",
+    links: [
+      { id: "1", title: "Helix Studio", url: "#", description: "Our brand + product work" },
+      { id: "2", title: "Case studies", url: "#", description: "12 recent projects" },
+      { id: "3", title: "Speaking", url: "#" },
+      { id: "4", title: "LinkedIn", url: "#" },
+    ],
+  },
+  lena: {
+    themeName: "gradient",
+    displayName: "Lena Morikawa",
+    profession: "Product photographer",
+    location: "Los Angeles",
+    bio: "Studio & on-location photography for brands that care about details.",
+    avatarInitial: "L",
+    links: [
+      { id: "1", title: "Book a shoot", url: "#" },
+      { id: "2", title: "Portfolio", url: "#" },
+      { id: "3", title: "Rates & packages", url: "#" },
+      { id: "4", title: "Instagram", url: "#" },
+    ],
+  },
+  you: {
+    themeName: "minimal",
+    displayName: "Your Name",
+    profession: "Your Title",
+    location: "Your City",
+    bio: "This is your LinkHub page. Customize it in the dashboard.",
+    avatarInitial: "Y",
+    links: [
+      { id: "1", title: "Add your first link", url: "#", description: "Edit in dashboard" },
+      { id: "2", title: "Personal site", url: "#" },
+      { id: "3", title: "Contact", url: "#" },
+    ],
+  },
+};
 
-    return page;
-  } catch (error) {
-    console.error("Error fetching page:", error);
-    return null;
-  }
+export function generateStaticParams() {
+  return Object.keys(MOCK_PROFILES).map((slug) => ({ slug }));
 }
 
-type ThemeName = "default" | "dark" | "gradient" | "minimal";
-
-function resolveThemeName(raw?: string | null): ThemeName {
-  if (raw === "dark" || raw === "gradient" || raw === "minimal") {
-    return raw;
-  }
-  return "default";
-}
-
-export default async function PublicPage({ params }: PageProps) {
-  const { slug } = params;
-  const pageData = await getPageData(slug);
-
-  if (!pageData) {
-    notFound();
-  }
-
-  const { title, description, links, user, theme } = pageData;
-  const profile = user.profile;
-
-  const themeName = resolveThemeName(theme?.themeName);
-
-  const displayName = title || profile?.displayName || user.email;
-  const initial = (displayName || "?").trim().charAt(0).toUpperCase();
+export default function PublicPage({ params }: { params: { slug: string } }) {
+  const profile = MOCK_PROFILES[params.slug];
+  if (!profile) notFound();
 
   return (
-    <div className="profile" data-theme={themeName}>
-      {themeName === "dark" && (
+    <div className="profile" data-theme={profile.themeName}>
+      {profile.themeName === "dark" && (
         <div className="profile__blobs" aria-hidden>
           <span className="blob blob--pink" />
           <span className="blob blob--indigo" />
@@ -74,30 +91,24 @@ export default async function PublicPage({ params }: PageProps) {
 
       <div className="profile__inner">
         <div className="profile__avatar">
-          {profile?.profileImageUrl ? (
-            <img src={profile.profileImageUrl} alt="" />
-          ) : (
-            <span>{initial}</span>
-          )}
+          <span>{profile.avatarInitial}</span>
         </div>
 
         <div className="profile__meta">
-          <div className="name">{displayName}</div>
-          {profile?.profession && (
+          <div className="name">{profile.displayName}</div>
+          {profile.profession && (
             <div className="role">{profile.profession}</div>
           )}
-          {profile?.location && (
+          {profile.location && (
             <div className="loc">
               <Icon.Pin size={12} /> {profile.location}
             </div>
           )}
-          {(description || profile?.bio) && (
-            <p className="bio">{description || profile?.bio}</p>
-          )}
+          {profile.bio && <p className="bio">{profile.bio}</p>}
         </div>
 
         <div className="profile__links">
-          {links.map((l) => (
+          {profile.links.map((l) => (
             <Link
               key={l.id}
               href={l.url}
@@ -123,18 +134,6 @@ export default async function PublicPage({ params }: PageProps) {
               </div>
             </Link>
           ))}
-          {links.length === 0 && (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "32px 0",
-                opacity: 0.7,
-                fontSize: 13,
-              }}
-            >
-              No links yet — check back soon.
-            </div>
-          )}
         </div>
 
         <div className="profile__footer">
@@ -144,32 +143,4 @@ export default async function PublicPage({ params }: PageProps) {
       </div>
     </div>
   );
-}
-
-export async function generateMetadata({ params }: PageProps) {
-  const { slug } = params;
-  const pageData = await getPageData(slug);
-
-  if (!pageData) {
-    return { title: "Page Not Found" };
-  }
-
-  const { title, description, user } = pageData;
-  const profile = user.profile;
-
-  return {
-    title: title || profile?.displayName || `${user.email}'s LinkHub`,
-    description:
-      description ||
-      profile?.bio ||
-      `Check out ${user.email}'s links on LinkHub`,
-    openGraph: {
-      title: title || profile?.displayName || `${user.email}'s LinkHub`,
-      description:
-        description ||
-        profile?.bio ||
-        `Check out ${user.email}'s links on LinkHub`,
-      images: profile?.profileImageUrl ? [profile.profileImageUrl] : [],
-    },
-  };
 }

@@ -1,31 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import type { Session } from "next-auth";
-import { useSession } from "next-auth/react";
 import { Icon } from "@/components/design/Icon";
 import { Logo } from "@/components/design/Logo";
 import { NFCBand } from "@/components/design/NFCBand";
 
 export default function HomePage() {
-  const { data: session } = useSession();
-
   return (
     <div className="mkt">
-      <MarketingNav session={session} />
-      <Hero session={session} />
+      <MarketingNav />
+      <Hero />
       <LogoStrip />
       <Features />
       <HowItWorks />
       <Testimonials />
       <Pricing />
-      <CTABand session={session} />
+      <CTABand />
       <Footer />
     </div>
   );
 }
 
-function MarketingNav({ session }: { session: Session | null }) {
+function MarketingNav() {
   return (
     <nav className="mkt-nav">
       <Logo />
@@ -37,27 +33,18 @@ function MarketingNav({ session }: { session: Session | null }) {
         <a>Changelog</a>
       </div>
       <div className="mkt-nav__actions">
-        {session ? (
-          <Link href="/dashboard" className="btn btn-primary">
-            Go to dashboard <Icon.Arrow size={14} />
-          </Link>
-        ) : (
-          <>
-            <Link href="/login" className="signin-link">
-              Sign in
-            </Link>
-            <Link href="/register" className="btn btn-primary">
-              Get LinkHub <Icon.Arrow size={14} />
-            </Link>
-          </>
-        )}
+        <Link href="/login" className="signin-link">
+          Sign in
+        </Link>
+        <Link href="/register" className="btn btn-primary">
+          Get LinkHub <Icon.Arrow size={14} />
+        </Link>
       </div>
     </nav>
   );
 }
 
-function Hero({ session }: { session: Session | null }) {
-  const claimHref = session ? "/dashboard" : "/register";
+function Hero() {
   return (
     <section className="mkt-hero">
       <div className="mkt-hero__blob-pink" />
@@ -77,7 +64,7 @@ function Hero({ session }: { session: Session | null }) {
             LinkHub is the link-in-bio for creators, networkers and brands — paired with a physical NFC wristband that shares your whole world with a single tap.
           </p>
           <div className="mkt-hero__actions">
-            <Link href={claimHref} className="btn btn-gradient">
+            <Link href="/register" className="btn btn-gradient">
               Claim your link <Icon.Arrow size={15} />
             </Link>
             <button type="button" className="btn btn-ghost">
@@ -380,8 +367,7 @@ function Pricing() {
   );
 }
 
-function CTABand({ session }: { session: Session | null }) {
-  const claimHref = session ? "/dashboard" : "/register";
+function CTABand() {
   return (
     <section className="mkt-cta">
       <div className="mkt-cta__inner">
@@ -390,7 +376,7 @@ function CTABand({ session }: { session: Session | null }) {
           <p>Claim yours free, or order a wristband and be live in three days.</p>
         </div>
         <div className="mkt-cta__actions">
-          <Link href={claimHref} className="btn btn-white">
+          <Link href="/register" className="btn btn-white">
             Claim your link
           </Link>
           <button type="button" className="btn btn-glass">
