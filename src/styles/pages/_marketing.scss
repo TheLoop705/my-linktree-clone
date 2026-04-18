@@ -1,0 +1,776 @@
+// ============================================================================
+// Marketing / landing page
+// Port of linkedtree/project/marketing.jsx inline styles.
+// ============================================================================
+
+.mkt {
+  background: var(--surface);
+  color: var(--text);
+}
+
+// ---- Top navbar ------------------------------------------------------------
+.mkt-nav {
+  display: flex;
+  align-items: center;
+  padding: 18px 40px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  &__links {
+    display: flex;
+    gap: 4px;
+    margin-left: 48px;
+
+    a {
+      padding: 8px 12px;
+      font-size: 14px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+  }
+
+  &__actions {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .signin-link {
+      font-size: 14px;
+      color: var(--text-2);
+      font-weight: 500;
+      padding: 8px 12px;
+    }
+  }
+}
+
+// ---- Hero ------------------------------------------------------------------
+.mkt-hero {
+  padding: 88px 80px 60px;
+  position: relative;
+  overflow: hidden;
+
+  &__blob-pink {
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(closest-side, rgba(236, 72, 153, 0.18), transparent 70%);
+    pointer-events: none;
+  }
+
+  &__blob-indigo {
+    position: absolute;
+    bottom: -300px;
+    left: -100px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(closest-side, rgba(99, 102, 241, 0.15), transparent 70%);
+    pointer-events: none;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+
+    @media (max-width: 980px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__title {
+    font-size: 76px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    margin: 0 0 24px;
+
+    @media (max-width: 720px) {
+      font-size: 52px;
+    }
+  }
+
+  &__lead {
+    font-size: 19px;
+    color: var(--text-2);
+    margin: 0 0 36px;
+    max-width: 520px;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .btn {
+      padding: 14px 22px;
+      font-size: 15px;
+    }
+  }
+
+  &__proofs {
+    display: flex;
+    gap: 28px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+
+    > div {
+      .top {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .bot {
+        font-size: 13px;
+        color: var(--text-3);
+      }
+    }
+  }
+}
+
+// Hero visual: rotated phone + floating wristband + pulse ring
+.mkt-hero-visual {
+  position: relative;
+  height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__phone {
+    width: 260px;
+    height: 540px;
+    border-radius: 40px;
+    background: #0b0b12;
+    padding: 8px;
+    box-shadow:
+      0 40px 80px -20px rgba(30, 20, 80, 0.35),
+      0 20px 40px -20px rgba(236, 72, 153, 0.25);
+    position: relative;
+    transform: rotate(-5deg);
+    z-index: 2;
+
+    &-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 32px;
+      background: linear-gradient(180deg, #eef0ff 0%, #fde8f2 100%);
+      overflow: hidden;
+      position: relative;
+      padding: 40px 20px 20px;
+    }
+
+    &-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      margin: 0 auto 12px;
+      box-shadow: 0 6px 16px -4px rgba(99, 102, 241, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    &-name {
+      text-align: center;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    &-role {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    &-links {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .item {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 11px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .swatch {
+          width: 20px;
+          height: 20px;
+          border-radius: 6px;
+        }
+      }
+    }
+  }
+
+  &__band {
+    position: absolute;
+    right: 10px;
+    bottom: 40px;
+    transform: rotate(12deg);
+    z-index: 3;
+  }
+
+  &__tap {
+    position: absolute;
+    top: 120px;
+    right: 70px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ec4899;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.8);
+    z-index: 4;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid #ec4899;
+      animation: pulse-ring 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+    }
+  }
+}
+
+// ---- Logo strip ------------------------------------------------------------
+.mkt-logos {
+  padding: 40px 80px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+
+  &__eyebrow {
+    font-size: 12px;
+    color: var(--text-3);
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+    opacity: 0.55;
+    flex-wrap: wrap;
+
+    span {
+      font-weight: 600;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+  }
+}
+
+// ---- Section headings / eyebrow -------------------------------------------
+.mkt-eyebrow {
+  font-size: 12px;
+  color: var(--indigo-600);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 12px;
+}
+
+.mkt-h2 {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin: 0;
+  line-height: 1.05;
+
+  @media (max-width: 720px) {
+    font-size: 36px;
+  }
+}
+
+// ---- Features --------------------------------------------------------------
+.mkt-features {
+  padding: 100px 80px;
+
+  &__head {
+    max-width: 640px;
+    margin-bottom: 60px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__card {
+    padding: 28px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+
+    .ico {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--g-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--indigo-600);
+      margin-bottom: 20px;
+    }
+
+    .t {
+      font-weight: 600;
+      font-size: 17px;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .d {
+      font-size: 13.5px;
+      color: var(--text-2);
+      line-height: 1.55;
+    }
+  }
+}
+
+// ---- How it works ----------------------------------------------------------
+.mkt-how {
+  padding: 100px 80px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--line);
+
+  &__head {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+
+    @media (max-width: 820px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__line {
+    position: absolute;
+    top: 40px;
+    left: 16%;
+    right: 16%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-2) 20%, var(--line-2) 80%, transparent);
+
+    @media (max-width: 820px) {
+      display: none;
+    }
+  }
+
+  &__step {
+    text-align: center;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+
+    .badge {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.08);
+
+      span {
+        font-size: 22px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #6366f1, #ec4899);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.02em;
+      }
+    }
+
+    .t {
+      font-weight: 600;
+      font-size: 20px;
+      margin-bottom: 10px;
+      letter-spacing: -0.015em;
+    }
+
+    .d {
+      font-size: 14px;
+      color: var(--text-2);
+      max-width: 280px;
+      margin: 0 auto;
+      line-height: 1.55;
+    }
+  }
+}
+
+// ---- Testimonials ----------------------------------------------------------
+.mkt-tests {
+  padding: 100px 80px;
+
+  &__head {
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__card {
+    margin: 0;
+    padding: 28px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    blockquote {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    figcaption {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .name {
+        font-weight: 600;
+        font-size: 13.5px;
+      }
+
+      .role {
+        font-size: 12px;
+        color: var(--text-3);
+      }
+    }
+  }
+}
+
+// ---- Pricing ---------------------------------------------------------------
+.mkt-price {
+  padding: 100px 80px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--line);
+
+  &__head {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+
+    @media (max-width: 880px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__tier {
+    padding: 32px;
+    border-radius: 20px;
+    background: #ffffff;
+    color: var(--text);
+    border: 1px solid var(--line);
+    position: relative;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    &--featured {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+      box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.4);
+    }
+
+    .popular {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+    }
+
+    .name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+
+    .price {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+
+      .amt {
+        font-size: 48px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+
+      .cadence {
+        font-size: 13px;
+        opacity: 0.6;
+      }
+    }
+
+    .desc {
+      font-size: 13.5px;
+      opacity: 0.7;
+      margin-top: 8px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+    }
+
+    &--featured .divider {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13.5px;
+
+        .dot {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: var(--indigo-100);
+          color: var(--indigo-600);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    &--featured ul li .dot {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .btn {
+      margin-top: auto;
+      width: 100%;
+    }
+  }
+}
+
+// ---- CTA band --------------------------------------------------------------
+.mkt-cta {
+  padding: 80px 80px;
+
+  &__inner {
+    background: var(--g-hero);
+    border-radius: 28px;
+    padding: 60px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    gap: 24px;
+
+    @media (max-width: 820px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px 200px at 80% 120%, rgba(255, 255, 255, 0.2), transparent);
+      pointer-events: none;
+    }
+  }
+
+  &__copy {
+    position: relative;
+    z-index: 1;
+    max-width: 560px;
+
+    h3 {
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin: 0 0 12px;
+      line-height: 1.05;
+    }
+
+    p {
+      font-size: 16px;
+      opacity: 0.85;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+
+    .btn {
+      padding: 14px 22px;
+    }
+  }
+}
+
+// ---- Footer ----------------------------------------------------------------
+.mkt-foot {
+  padding: 60px 80px 40px;
+  border-top: 1px solid var(--line);
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1.3fr repeat(4, 1fr);
+    gap: 40px;
+    margin-bottom: 48px;
+
+    @media (max-width: 1000px) {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__brand-blurb {
+    font-size: 13.5px;
+    color: var(--text-2);
+    margin-top: 16px;
+    max-width: 280px;
+    line-height: 1.5;
+  }
+
+  &__col h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-3);
+    margin: 0 0 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  &__col div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    a {
+      font-size: 13.5px;
+      color: var(--text-2);
+
+      &:hover {
+        color: var(--text);
+      }
+    }
+  }
+
+  &__bottom {
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-3);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}

@@ -2,36 +2,18 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import {
-  Trash2,
-  ExternalLink,
-  Plus,
-  Settings,
-  Eye,
-  GripVertical,
-} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Icon } from "@/components/design/Icon";
 
-interface Link {
+interface LinkItem {
   id: string;
   title: string;
   url: string;
   description?: string;
   isActive: boolean;
   position: number;
+  clicks?: number;
+  color?: string;
 }
 
 interface UserPage {
@@ -43,26 +25,77 @@ interface UserPage {
   theme?: {
     themeName?: string;
   };
-  links: Link[];
+  links: LinkItem[];
 }
 
-// Add theme options
-const THEME_OPTIONS = [
-  { value: "default", label: "Default", bg: "bg-white", accent: "bg-blue-600" },
-  {
-    value: "dark",
-    label: "Dark Mode",
-    bg: "bg-gray-900",
-    accent: "bg-purple-600",
-  },
-  {
-    value: "gradient",
-    label: "Gradient",
-    bg: "bg-gradient-to-br from-pink-500 to-orange-400",
-    accent: "bg-white",
-  },
-  { value: "minimal", label: "Minimal", bg: "bg-gray-50", accent: "bg-black" },
-];
+const SparkSvg = () => (
+  <svg preserveAspectRatio="none" viewBox="0 0 100 20">
+    <polyline
+      fill="none"
+      stroke="var(--indigo)"
+      strokeWidth="1.2"
+      points="0,15 10,12 20,13 30,9 40,11 50,7 60,8 70,5 80,6 90,3 100,2"
+    />
+  </svg>
+);
+
+function DashPreview({
+  userPage,
+}: {
+  userPage: UserPage | null;
+}) {
+  if (!userPage) return null;
+
+  const email = userPage.slug || "you";
+  const initial = (email[0] ?? "U").toUpperCase();
+  const displayName = userPage.title || email;
+  const activeLinks = userPage.links.filter((l) => l.isActive);
+
+  return (
+    <div className="dash-preview">
+      <div className="dash-preview__head">
+        <div className="eyebrow mono">LIVE PREVIEW</div>
+        <div className="seg">
+          <button type="button" aria-pressed="true">
+            Mobile
+          </button>
+          <button type="button" aria-pressed="false">
+            Desktop
+          </button>
+        </div>
+      </div>
+      <div className="dash-preview__phone">
+        <div className="screen">
+          <div className="avatar">{initial}</div>
+          <div className="name">{displayName}</div>
+          <div className="role">Your link page</div>
+          <div className="links">
+            {activeLinks.slice(0, 6).map((l) => (
+              <div key={l.id} className="item">
+                <div
+                  className="emoji"
+                  style={{
+                    background: (l.color || "#6366f1") + "22",
+                    color: l.color || "#6366f1",
+                  }}
+                >
+                  🔗
+                </div>
+                <span>{l.title}</span>
+              </div>
+            ))}
+          </div>
+          <div className="foot">Powered by LinkHub</div>
+        </div>
+      </div>
+      <div className="dash-preview__url">
+        <Icon.Globe size={14} />{" "}
+        <span className="mono">linkhub.to/{userPage.slug}</span>
+        <button type="button">Copy</button>
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const { data: session } = useSession();
@@ -87,7 +120,6 @@ export default function Dashboard() {
         const data = await response.json();
         setUserPage(data);
       } else {
-        // Create a default page if none exists
         await createDefaultPage();
       }
     } catch (error) {
@@ -106,9 +138,7 @@ export default function Dashboard() {
     try {
       const response = await fetch("/api/pages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug: `${session?.user?.email?.split("@")[0] || "user"}-${Date.now()}`,
           title: `${session?.user?.email}'s Links`,
@@ -143,9 +173,7 @@ export default function Dashboard() {
     try {
       const response = await fetch("/api/links", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pageId: userPage?.id,
           ...newLink,
@@ -156,19 +184,11 @@ export default function Dashboard() {
       if (response.ok) {
         const linkData = await response.json();
         setUserPage((prev) =>
-          prev
-            ? {
-                ...prev,
-                links: [...prev.links, linkData],
-              }
-            : null
+          prev ? { ...prev, links: [...prev.links, linkData] } : null
         );
         setNewLink({ title: "", url: "", description: "" });
         setIsAddingLink(false);
-        toast({
-          title: "Success",
-          description: "Link added successfully!",
-        });
+        toast({ title: "Success", description: "Link added successfully!" });
       } else {
         throw new Error("Failed to add link");
       }
@@ -191,16 +211,10 @@ export default function Dashboard() {
       if (response.ok) {
         setUserPage((prev) =>
           prev
-            ? {
-                ...prev,
-                links: prev.links.filter((link) => link.id !== linkId),
-              }
+            ? { ...prev, links: prev.links.filter((l) => l.id !== linkId) }
             : null
         );
-        toast({
-          title: "Success",
-          description: "Link deleted successfully!",
-        });
+        toast({ title: "Success", description: "Link deleted successfully!" });
       } else {
         throw new Error("Failed to delete link");
       }
@@ -218,9 +232,7 @@ export default function Dashboard() {
     try {
       const response = await fetch(`/api/links/${linkId}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive }),
       });
 
@@ -248,308 +260,262 @@ export default function Dashboard() {
     }
   };
 
-  const updateTheme = async (newTheme: string) => {
-    if (!userPage) return;
-
-    try {
-      const response = await fetch(`/api/pages/${userPage.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ theme: newTheme }),
-      });
-      if (response.ok) {
-        setUserPage((prev) =>
-          prev ? { ...prev, theme: { themeName: newTheme } } : null
-        );
-        toast({
-          title: "Success",
-          description: "Theme updated successfully!",
-          variant: "default",
-        });
-      } else {
-        throw new Error("Failed to update theme");
-      }
-    } catch (error) {
-      console.error("Error updating theme:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update theme. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
+      <div className="dash-main">
+        <div className="dash-main__left">
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: 400,
+              color: "var(--text-2)",
+              fontSize: 14,
+            }}
+          >
+            Loading your dashboard...
+          </div>
         </div>
+        <div className="dash-main__right" />
       </div>
     );
   }
 
+  const links = userPage?.links ?? [];
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Manage your LinkHub page and links</p>
+    <div className="dash-main">
+      <div className="dash-main__left">
+        <div className="dash-header">
+          <div>
+            <div className="dash-header__eyebrow mono">LINKS</div>
+            <h1>Your links</h1>
+          </div>
+          <div className="dash-header__actions">
+            <button type="button" className="btn btn-ghost">
+              <Icon.Eye size={14} /> Preview
+            </button>
+            <button type="button" className="btn btn-ghost">
+              <Icon.Copy size={14} /> Copy URL
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setIsAddingLink(true)}
+            >
+              <Icon.Plus size={14} /> Add link
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          {userPage && (
-            <Button asChild variant="outline">
-              <Link href={`/${userPage.slug}`} target="_blank">
-                <Eye className="w-4 h-4 mr-2" />
-                View Page
-              </Link>
-            </Button>
-          )}
-          <Button asChild variant="outline">
-            <Link href="/dashboard/profile">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Link>
-          </Button>
+
+        <div className="dash-stats">
+          <div className="dash-stats__card">
+            <div className="l">Page views</div>
+            <div className="row">
+              <div className="v">12,483</div>
+              <div className="delta delta--up">+18.2%</div>
+            </div>
+            <div className="spark">
+              <SparkSvg />
+            </div>
+          </div>
+          <div className="dash-stats__card">
+            <div className="l">Link clicks</div>
+            <div className="row">
+              <div className="v">3,842</div>
+              <div className="delta delta--up">+12.5%</div>
+            </div>
+            <div className="spark">
+              <SparkSvg />
+            </div>
+          </div>
+          <div className="dash-stats__card">
+            <div className="l">NFC taps</div>
+            <div className="row">
+              <div className="v">1,249</div>
+              <div className="delta delta--up">+32.1%</div>
+            </div>
+            <div className="spark">
+              <SparkSvg />
+            </div>
+          </div>
+          <div className="dash-stats__card">
+            <div className="l">Click rate</div>
+            <div className="row">
+              <div className="v">30.8%</div>
+              <div className="delta delta--up">+4.3%</div>
+            </div>
+            <div className="spark">
+              <SparkSvg />
+            </div>
+          </div>
+        </div>
+
+        {isAddingLink && (
+          <div className="card" style={{ padding: 20, marginTop: 20 }}>
+            <div className="field">
+              <label className="label" htmlFor="link-title">
+                Title
+              </label>
+              <input
+                className="input"
+                id="link-title"
+                type="text"
+                placeholder="e.g., My Portfolio"
+                value={newLink.title}
+                onChange={(e) =>
+                  setNewLink((prev) => ({ ...prev, title: e.target.value }))
+                }
+              />
+            </div>
+            <div className="field">
+              <label className="label" htmlFor="link-url">
+                URL
+              </label>
+              <input
+                className="input"
+                id="link-url"
+                type="url"
+                placeholder="https://example.com"
+                value={newLink.url}
+                onChange={(e) =>
+                  setNewLink((prev) => ({ ...prev, url: e.target.value }))
+                }
+              />
+            </div>
+            <div className="field">
+              <label className="label" htmlFor="link-desc">
+                Description (optional)
+              </label>
+              <textarea
+                className="input"
+                id="link-desc"
+                rows={2}
+                placeholder="Brief description of this link"
+                value={newLink.description}
+                onChange={(e) =>
+                  setNewLink((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <button type="button" className="btn btn-primary" onClick={addLink}>
+                Add Link
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setIsAddingLink(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="dash-links">
+          <div className="dash-links__head">
+            <div className="t">{links.length} links · drag to reorder</div>
+            <div className="r mono">LAST 30 DAYS</div>
+          </div>
+          <div className="dash-links__list">
+            {links
+              .sort((a, b) => a.position - b.position)
+              .map((l) => (
+                <div
+                  key={l.id}
+                  className="dash-links__item"
+                  data-inactive={!l.isActive}
+                >
+                  <span className="grip">
+                    <Icon.Grip size={14} />
+                  </span>
+                  <div
+                    className="emoji"
+                    style={{
+                      background: (l.color || "#6366f1") + "22",
+                      color: l.color || "#6366f1",
+                    }}
+                  >
+                    🔗
+                  </div>
+                  <div className="body">
+                    <div className="t">{l.title}</div>
+                    <div className="u mono">{l.url}</div>
+                  </div>
+                  <div className="clicks">
+                    <Icon.ArrowUp size={11} />{" "}
+                    <span className="mono">
+                      {(l.clicks ?? 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="lh-toggle"
+                    data-on={l.isActive ? "true" : "false"}
+                    onClick={() => toggleLinkStatus(l.id, !l.isActive)}
+                    aria-label="Toggle link"
+                  >
+                    <span className="lh-toggle__knob" />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    style={{ padding: 6 }}
+                    onClick={() => deleteLink(l.id)}
+                  >
+                    <Icon.Trash size={14} />
+                  </button>
+                </div>
+              ))}
+            <button
+              type="button"
+              className="dash-links__add"
+              onClick={() => setIsAddingLink(true)}
+            >
+              <Icon.Plus size={14} /> Add a new link
+            </button>
+          </div>
+        </div>
+
+        <div className="dash-nfc">
+          <div className="dash-nfc__head">
+            <div className="t">Paired NFC devices</div>
+            <button type="button" className="pair-btn">
+              + Pair new wristband
+            </button>
+          </div>
+          <div className="dash-nfc__list">
+            <div className="dash-nfc__item">
+              <div className="ico">
+                <Icon.NFC size={18} />
+              </div>
+              <div className="body">
+                <div className="n">Rose silicone · everyday</div>
+                <div className="s mono">LH-S · Last tap 2h ago</div>
+              </div>
+              <div className="taps mono">483 taps</div>
+            </div>
+            <div className="dash-nfc__item">
+              <div className="ico">
+                <Icon.NFC size={18} />
+              </div>
+              <div className="body">
+                <div className="n">Black leather · events</div>
+                <div className="s mono">LH-L · Last tap 1d ago</div>
+              </div>
+              <div className="taps mono">766 taps</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Page Info */}
-      {userPage && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Your LinkHub Page</CardTitle>
-            <CardDescription>
-              Your public page is available at:
-              <Link
-                href={`/${userPage.slug}`}
-                target="_blank"
-                className="ml-2 text-blue-600 hover:underline"
-              >
-                {window.location.origin}/{userPage.slug}
-                <ExternalLink className="w-3 h-3 ml-1 inline" />
-              </Link>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="page-title">Page Title</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  {userPage.title || "Untitled Page"}
-                </p>
-              </div>
-              <div>
-                <Label htmlFor="page-description">Description</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  {userPage.description || "No description"}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Theme Customization */}
-      {userPage && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Theme Customization</CardTitle>
-            <CardDescription>
-              Choose a theme for your LinkHub page.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              {" "}
-              {THEME_OPTIONS.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={
-                    userPage.theme?.themeName === option.value
-                      ? "default"
-                      : "outline"
-                  }
-                  className="flex-1"
-                  onClick={() => updateTheme(option.value)}
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Links Management */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Your Links</CardTitle>
-            <CardDescription>
-              Add, edit, and manage your links. Drag to reorder them.
-            </CardDescription>
-          </div>
-          <Button onClick={() => setIsAddingLink(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Link
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Add Link Form */}
-          {isAddingLink && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Add New Link</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="link-title">Title</Label>
-                  <Input
-                    id="link-title"
-                    placeholder="e.g., My Portfolio"
-                    value={newLink.title}
-                    onChange={(e) =>
-                      setNewLink((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="link-url">URL</Label>
-                  <Input
-                    id="link-url"
-                    placeholder="https://example.com"
-                    value={newLink.url}
-                    onChange={(e) =>
-                      setNewLink((prev) => ({ ...prev, url: e.target.value }))
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="link-description">
-                    Description (optional)
-                  </Label>{" "}
-                  <Textarea
-                    id="link-description"
-                    placeholder="Brief description of this link"
-                    value={newLink.description}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      setNewLink((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={addLink}>Add Link</Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsAddingLink(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Links List */}
-          {userPage?.links && userPage.links.length > 0 ? (
-            <div className="space-y-3">
-              {userPage.links
-                .sort((a, b) => a.position - b.position)
-                .map((link) => (
-                  <Card
-                    key={link.id}
-                    className={`${!link.isActive ? "opacity-50" : ""}`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
-                          <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-                          <div className="flex-1">
-                            <h3 className="font-medium">{link.title}</h3>
-                            <p className="text-sm text-gray-600 truncate">
-                              {link.url}
-                            </p>
-                            {link.description && (
-                              <p className="text-sm text-gray-500 mt-1">
-                                {link.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {" "}
-                          <Switch
-                            checked={link.isActive}
-                            onCheckedChange={(checked: boolean) =>
-                              toggleLinkStatus(link.id, checked)
-                            }
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.open(link.url, "_blank")}
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteLink(link.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">No links added yet</p>
-              <Button onClick={() => setIsAddingLink(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Your First Link
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-2xl font-bold">
-              {userPage?.links?.length || 0}
-            </div>
-            <p className="text-gray-600">Total Links</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-2xl font-bold">
-              {userPage?.links?.filter((link) => link.isActive).length || 0}
-            </div>
-            <p className="text-gray-600">Active Links</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-2xl font-bold">
-              {userPage?.isPublic ? "Public" : "Private"}
-            </div>
-            <p className="text-gray-600">Page Status</p>
-          </CardContent>
-        </Card>
+      <div className="dash-main__right">
+        <DashPreview userPage={userPage} />
       </div>
     </div>
   );

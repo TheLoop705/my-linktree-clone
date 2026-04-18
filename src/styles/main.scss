@@ -1,0 +1,29 @@
+// ============================================================================
+// LinkHub — main stylesheet entry point
+// All partials are imported here so there's a single source of truth for
+// styling. Add new partials below in the order: tokens → base → components →
+// pages → animations (animations last so keyframes don't get shadowed).
+// ============================================================================
+
+// Tokens & base --------------------------------------------------------------
+@use 'tokens';
+@use 'base';
+
+// Shared components ----------------------------------------------------------
+@use 'components/atoms';
+@use 'components/buttons';
+@use 'components/forms';
+@use 'components/logo';
+@use 'components/mobile-frame';
+@use 'components/nfc-band';
+@use 'components/toggle';
+
+// Page styles ---------------------------------------------------------------
+@use 'pages/marketing';
+@use 'pages/auth';
+@use 'pages/dashboard';
+@use 'pages/profile';
+@use 'pages/nfc';
+
+// Animations last so custom keyframes aren't overridden ---------------------
+@use 'animations';

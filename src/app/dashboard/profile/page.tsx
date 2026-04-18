@@ -2,19 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { Icon } from "@/components/design/Icon";
 
 interface UserProfileData {
   displayName: string;
@@ -34,7 +23,7 @@ interface PageData {
 }
 
 export default function ProfilePage() {
-  const { data: session, status, update: updateSession } = useSession();
+  const { data: session, status } = useSession();
   const { toast } = useToast();
 
   const [profile, setProfile] = useState<UserProfileData>({
@@ -56,9 +45,7 @@ export default function ProfilePage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
-  // Load user profile and page data
   useEffect(() => {
     if (session?.user) {
       loadProfileData();
@@ -83,7 +70,6 @@ export default function ProfilePage() {
       });
     } catch (error) {
       console.error("Error loading profile:", error);
-      // Set defaults from session if API fails
       setProfile((prev) => ({
         ...prev,
         displayName: session?.user?.email?.split("@")[0] || "",
@@ -108,14 +94,9 @@ export default function ProfilePage() {
       console.error("Error loading page data:", error);
     }
   };
+
   const handleProfileChange = (name: string, value: string) => {
     setProfile((prev) => ({ ...prev, [name]: value }));
-    // Clear error for this field
-    if (errors[name]) {
-      const newErrors = { ...errors };
-      delete newErrors[name];
-      setErrors(newErrors);
-    }
   };
 
   const handlePageChange = (name: string, value: string | boolean) => {
@@ -125,7 +106,6 @@ export default function ProfilePage() {
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrors({});
 
     try {
       const response = await fetch("/api/profile", {
@@ -134,9 +114,7 @@ export default function ProfilePage() {
         body: JSON.stringify(profile),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
+      if (!response.ok) throw new Error("Failed to update profile");
 
       toast({
         title: "Profile Updated",
@@ -169,9 +147,7 @@ export default function ProfilePage() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update page settings");
-      }
+      if (!response.ok) throw new Error("Failed to update page settings");
 
       toast({
         title: "Page Settings Updated",
@@ -191,255 +167,261 @@ export default function ProfilePage() {
 
   if (status === "loading") {
     return (
-      <div className="container mx-auto p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="h-96 bg-gray-200 rounded"></div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+      <div className="dash-main">
+        <div className="dash-main__left">
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: 400,
+              color: "var(--text-2)",
+              fontSize: 14,
+            }}
+          >
+            Loading...
           </div>
         </div>
+        <div className="dash-main__right" />
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p>Please sign in to access your profile.</p>
-          </CardContent>
-        </Card>
+      <div className="dash-main">
+        <div className="dash-main__left">
+          <div className="card" style={{ padding: 24 }}>
+            <p style={{ margin: 0 }}>Please sign in to access your profile.</p>
+          </div>
+        </div>
+        <div className="dash-main__right" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Profile Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your profile information and page settings.
-        </p>
-      </div>
+    <div className="dash-main">
+      <div className="dash-main__left" style={{ padding: "20px 28px 32px" }}>
+        <div className="dash-header">
+          <div>
+            <div className="dash-header__eyebrow mono">SETTINGS</div>
+            <h1>Profile</h1>
+          </div>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Profile Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your personal information that will be displayed on your
-              public page.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleProfileSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="displayName">Display Name *</Label>
-                <Input
-                  id="displayName"
-                  value={profile.displayName}
-                  onChange={(e) =>
-                    handleProfileChange("displayName", e.target.value)
-                  }
-                  placeholder="Your display name"
+        <form onSubmit={handleProfileSubmit}>
+          <div className="card" style={{ padding: 24, marginBottom: 16 }}>
+            <h2 style={{ fontSize: 17, margin: "0 0 16px", fontWeight: 600 }}>
+              Profile information
+            </h2>
+
+            <div className="field">
+              <label className="label" htmlFor="displayName">
+                Display Name
+              </label>
+              <input
+                className="input"
+                id="displayName"
+                type="text"
+                value={profile.displayName}
+                onChange={(e) =>
+                  handleProfileChange("displayName", e.target.value)
+                }
+                placeholder="Your display name"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="bio">
+                Bio
+              </label>
+              <textarea
+                className="input"
+                id="bio"
+                value={profile.bio}
+                onChange={(e) => handleProfileChange("bio", e.target.value)}
+                placeholder="Tell us about yourself..."
+                rows={3}
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="profession">
+                Profession
+              </label>
+              <input
+                className="input"
+                id="profession"
+                type="text"
+                value={profile.profession}
+                onChange={(e) =>
+                  handleProfileChange("profession", e.target.value)
+                }
+                placeholder="Your profession or title"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="location">
+                Location
+              </label>
+              <input
+                className="input"
+                id="location"
+                type="text"
+                value={profile.location}
+                onChange={(e) =>
+                  handleProfileChange("location", e.target.value)
+                }
+                placeholder="Your location"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="websiteUrl">
+                Website URL
+              </label>
+              <input
+                className="input"
+                id="websiteUrl"
+                type="url"
+                value={profile.websiteUrl}
+                onChange={(e) =>
+                  handleProfileChange("websiteUrl", e.target.value)
+                }
+                placeholder="https://your-website.com"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="profileImageUrl">
+                Profile Image URL
+              </label>
+              <input
+                className="input"
+                id="profileImageUrl"
+                type="url"
+                value={profile.profileImageUrl}
+                onChange={(e) =>
+                  handleProfileChange("profileImageUrl", e.target.value)
+                }
+                placeholder="https://your-image-url.com/image.jpg"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoading}
+            >
+              {isLoading ? "Saving\u2026" : "Save changes"}
+            </button>
+          </div>
+        </form>
+
+        <form onSubmit={handlePageSubmit}>
+          <div className="card" style={{ padding: 24 }}>
+            <h2 style={{ fontSize: 17, margin: "0 0 16px", fontWeight: 600 }}>
+              Page settings
+            </h2>
+
+            <div className="field">
+              <label className="label" htmlFor="slug">
+                Page URL
+              </label>
+              <div className="input-inline-prefix">
+                <span className="prefix mono">linkhub.to/</span>
+                <input
+                  className="input"
+                  id="slug"
+                  value={pageSettings.slug}
+                  disabled
                 />
-                {errors.displayName && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.displayName[0]}
-                  </p>
-                )}
               </div>
+            </div>
 
+            <div className="field">
+              <label className="label" htmlFor="title">
+                Page Title
+              </label>
+              <input
+                className="input"
+                id="title"
+                type="text"
+                value={pageSettings.title}
+                onChange={(e) => handlePageChange("title", e.target.value)}
+                placeholder="Your page title"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="description">
+                Page Description
+              </label>
+              <textarea
+                className="input"
+                id="description"
+                value={pageSettings.description}
+                onChange={(e) =>
+                  handlePageChange("description", e.target.value)
+                }
+                placeholder="Describe your page..."
+                rows={3}
+              />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                marginBottom: 16,
+              }}
+            >
               <div>
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={profile.bio}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    handleProfileChange("bio", e.target.value)
-                  }
-                  placeholder="Tell us about yourself..."
-                  rows={3}
-                />
-                {errors.bio && (
-                  <p className="text-sm text-red-600 mt-1">{errors.bio[0]}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="profession">Profession</Label>
-                <Input
-                  id="profession"
-                  value={profile.profession}
-                  onChange={(e) =>
-                    handleProfileChange("profession", e.target.value)
-                  }
-                  placeholder="Your profession or title"
-                />
-                {errors.profession && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.profession[0]}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={profile.location}
-                  onChange={(e) =>
-                    handleProfileChange("location", e.target.value)
-                  }
-                  placeholder="Your location"
-                />
-                {errors.location && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.location[0]}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="websiteUrl">Website URL</Label>
-                <Input
-                  id="websiteUrl"
-                  type="url"
-                  value={profile.websiteUrl}
-                  onChange={(e) =>
-                    handleProfileChange("websiteUrl", e.target.value)
-                  }
-                  placeholder="https://your-website.com"
-                />
-                {errors.websiteUrl && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.websiteUrl[0]}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="profileImageUrl">Profile Image URL</Label>
-                <Input
-                  id="profileImageUrl"
-                  type="url"
-                  value={profile.profileImageUrl}
-                  onChange={(e) =>
-                    handleProfileChange("profileImageUrl", e.target.value)
-                  }
-                  placeholder="https://your-image-url.com/image.jpg"
-                />
-                {errors.profileImageUrl && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.profileImageUrl[0]}
-                  </p>
-                )}
-              </div>
-
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? "Updating..." : "Update Profile"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Page Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Page Settings</CardTitle>
-            <CardDescription>
-              Configure your public page settings and visibility.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePageSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="slug">Page URL</Label>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">
-                    {typeof window !== "undefined"
-                      ? window.location.origin
-                      : "http://localhost:3000"}
-                    /
-                  </span>
-                  <Input
-                    id="slug"
-                    value={pageSettings.slug}
-                    disabled
-                    className="bg-muted"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Your page URL cannot be changed after creation.
+                <label
+                  className="label"
+                  htmlFor="isPublic"
+                  style={{ marginBottom: 2 }}
+                >
+                  Public Page
+                </label>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 12,
+                    color: "var(--text-3)",
+                  }}
+                >
+                  Make your page visible to everyone
                 </p>
               </div>
+              <button
+                type="button"
+                className="lh-toggle"
+                data-on={pageSettings.isPublic ? "true" : "false"}
+                onClick={() =>
+                  handlePageChange("isPublic", !pageSettings.isPublic)
+                }
+                aria-label="Toggle public"
+              >
+                <span className="lh-toggle__knob" />
+              </button>
+            </div>
 
-              <div>
-                <Label htmlFor="title">Page Title</Label>
-                <Input
-                  id="title"
-                  value={pageSettings.title}
-                  onChange={(e) => handlePageChange("title", e.target.value)}
-                  placeholder="Your page title"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">Page Description</Label>
-                <Textarea
-                  id="description"
-                  value={pageSettings.description}
-                  onChange={(e) =>
-                    handlePageChange("description", e.target.value)
-                  }
-                  placeholder="Describe your page..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="isPublic">Public Page</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Make your page visible to everyone
-                  </p>
-                </div>
-                <Switch
-                  id="isPublic"
-                  checked={pageSettings.isPublic}
-                  onCheckedChange={(checked: boolean) =>
-                    handlePageChange("isPublic", checked)
-                  }
-                />
-              </div>
-
-              <Button type="submit" disabled={isLoadingPage} className="w-full">
-                {isLoadingPage ? "Updating..." : "Update Page Settings"}
-              </Button>
-            </form>
-
-            {pageSettings.slug && (
-              <div className="mt-4 p-4 bg-muted rounded-lg">
-                <p className="text-sm font-medium">Your Public Page:</p>
-                <a
-                  href={`/${pageSettings.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline text-sm break-all"
-                >
-                  {typeof window !== "undefined"
-                    ? window.location.origin
-                    : "http://localhost:3000"}
-                  /{pageSettings.slug}
-                </a>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoadingPage}
+            >
+              {isLoadingPage ? "Saving\u2026" : "Save settings"}
+            </button>
+          </div>
+        </form>
       </div>
+      <div className="dash-main__right" />
     </div>
   );
 }

@@ -1,0 +1,432 @@
+// ============================================================================
+// Public profile page — 4 themes (default, dark, gradient, minimal)
+// The public [slug] page renders full-screen (no mobile-frame chrome).
+// ============================================================================
+
+.profile {
+  min-height: 100vh;
+  overflow: auto;
+
+  &__inner {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 40px 22px 32px;
+
+    @media (min-width: 640px) {
+      padding: 56px 22px 40px;
+    }
+  }
+
+  &__avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  }
+
+  &__meta {
+    text-align: center;
+    margin-bottom: 22px;
+
+    .name {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .role {
+      font-size: 14px;
+      margin-top: 2px;
+      color: var(--text-2);
+    }
+
+    .loc {
+      font-size: 13px;
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.8;
+    }
+
+    .bio {
+      font-size: 13.5px;
+      margin: 14px 20px 0;
+      line-height: 1.5;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__footer {
+    text-align: center;
+    padding: 22px 0 16px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    opacity: 0.7;
+    color: var(--text-3);
+
+    .mark {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+    }
+
+    strong {
+      font-weight: 600;
+    }
+  }
+}
+
+// ---- Theme: default (light indigo) ----------------------------------------
+.profile[data-theme="default"] {
+  background: linear-gradient(180deg, #eef0ff 0%, #f6f6fb 40%, #ffffff 100%);
+  color: var(--text);
+
+  .profile__avatar {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  }
+
+  .profile__meta .role,
+  .profile__meta .loc,
+  .profile__meta .bio {
+    color: var(--text-2);
+  }
+
+  .link-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 6px -2px rgba(60, 50, 150, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.08);
+    color: var(--text);
+
+    &__emoji {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+
+      .t {
+        font-size: 14.5px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .s {
+        font-size: 12px;
+        color: var(--text-3);
+      }
+    }
+
+    &__arrow {
+      color: var(--text-3);
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ---- Theme: dark glassmorphism --------------------------------------------
+.profile[data-theme="dark"] {
+  background: #0a0a12;
+  color: #ffffff;
+  position: relative;
+
+  .profile__blobs {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(30px);
+
+      &--pink {
+        top: -60px;
+        left: -60px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(closest-side, rgba(236, 72, 153, 0.5), transparent 70%);
+      }
+      &--indigo {
+        top: 240px;
+        right: -80px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(closest-side, rgba(99, 102, 241, 0.5), transparent 70%);
+      }
+      &--cyan {
+        bottom: -120px;
+        left: -40px;
+        width: 280px;
+        height: 280px;
+        background: radial-gradient(closest-side, rgba(6, 182, 212, 0.4), transparent 70%);
+      }
+    }
+  }
+
+  .profile__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile__avatar {
+    background: linear-gradient(135deg, #ec4899, #6366f1);
+  }
+
+  .profile__meta {
+    .name { color: #ffffff; }
+    .role { color: rgba(255, 255, 255, 0.7); }
+    .loc  { color: rgba(255, 255, 255, 0.6); }
+    .bio  { color: rgba(255, 255, 255, 0.7); }
+  }
+
+  .profile__footer {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .link-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ffffff;
+
+    &__emoji {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      filter: saturate(1.3) brightness(1.2);
+      flex-shrink: 0;
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+
+      .t {
+        font-size: 14.5px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .s {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+    }
+
+    &__arrow {
+      color: rgba(255, 255, 255, 0.7);
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ---- Theme: gradient pink → orange → yellow -------------------------------
+.profile[data-theme="gradient"] {
+  background: linear-gradient(180deg, #ec4899 0%, #f97316 45%, #facc15 100%);
+  color: #ffffff;
+
+  .profile__avatar {
+    background: rgba(255, 255, 255, 0.95);
+    color: #ec4899;
+  }
+
+  .profile__meta {
+    .name {
+      color: #ffffff;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .role {
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 500;
+    }
+    .loc  { color: rgba(255, 255, 255, 0.85); }
+    .bio  { color: rgba(255, 255, 255, 0.9); }
+  }
+
+  .profile__footer {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .link-card {
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.15);
+    color: var(--text);
+
+    &__emoji {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+
+      .t {
+        font-size: 14.5px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .s {
+        display: none;
+      }
+    }
+
+    &__arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #f97316);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ---- Theme: minimal black/white -------------------------------------------
+.profile[data-theme="minimal"] {
+  background: #ffffff;
+  color: var(--text);
+
+  .profile__avatar {
+    background: #0b0b12;
+    width: 72px;
+    height: 72px;
+  }
+
+  .profile__meta {
+    .name {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+    .role {
+      font-size: 13px;
+      color: #7a7a88;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: 'Geist Mono', ui-monospace, monospace;
+    }
+    .loc {
+      display: none;
+    }
+    .bio {
+      font-size: 14px;
+      color: #4b4b57;
+    }
+  }
+
+  .profile__links {
+    gap: 0;
+  }
+
+  .link-card {
+    padding: 18px 4px;
+    border-top: 1px solid #ececf2;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: transparent;
+    border-radius: 0;
+    color: var(--text);
+
+    &:last-child {
+      border-bottom: 1px solid #ececf2;
+    }
+
+    &__emoji {
+      display: none;
+    }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+
+      .t {
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+      .s {
+        font-size: 12px;
+        color: #7a7a88;
+        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: 'Geist Mono', ui-monospace, monospace;
+      }
+    }
+
+    &__arrow {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #0b0b12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0b0b12;
+      flex-shrink: 0;
+    }
+  }
+}

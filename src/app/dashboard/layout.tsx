@@ -1,17 +1,11 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  Settings,
-  User,
-  LogOut,
-  Link as LinkIcon,
-} from "lucide-react";
+import { Logo } from "@/components/design/Logo";
+import { Icon } from "@/components/design/Icon";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -20,99 +14,173 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (status === "loading") return; // Do nothing while loading
+    if (status === "loading") return;
     if (!session) {
-      router.push("/login"); // Redirect to login if not authenticated
+      router.push("/login");
     }
   }, [session, status, router]);
 
   if (status === "loading" || !session) {
-    // You can render a loading spinner here or null
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--bg)",
+          color: "var(--text-2)",
+          fontSize: 14,
+        }}
+      >
+        Loading…
       </div>
     );
   }
 
-  // If session exists, render the children (the dashboard page)
+  const email = session.user?.email ?? "";
+  const initial = (email[0] ?? "U").toUpperCase();
+  const slug = email ? email.split("@")[0] : "you";
+
+  const isLinksActive = pathname === "/dashboard";
+  const isProfileActive = pathname === "/dashboard/profile";
+  const isNfcActive = pathname === "/dashboard/nfc";
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <LinkIcon className="h-8 w-8 text-blue-600 mr-2" />
-                <h1 className="text-2xl font-bold text-gray-900">LinkHub</h1>
-              </Link>
-            </div>
+    <div className="dash" data-dash-theme="light">
+      <aside className="dash-side">
+        <div className="dash-side__brand">
+          <Logo size={24} />
+        </div>
 
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link
-                href="/dashboard"
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Dashboard
-              </Link>
-              <Link
-                href="/dashboard/profile"
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Link>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <User className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">
-                  {session.user?.email}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex items-center"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
+        <div className="dash-side__account">
+          <div className="box">
+            <div className="avatar">{initial}</div>
+            <div className="info">
+              <div className="name">Your Hub</div>
+              <div className="url mono">linkhub.to/{slug || "you"}</div>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-6 py-2">
-            <Link
-              href="/dashboard"
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm"
-            >
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              Dashboard
-            </Link>
-            <Link
-              href="/dashboard/profile"
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors text-sm"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Link>
-          </div>
+        <nav className="dash-side__nav">
+          <Link
+            href="/dashboard"
+            aria-current={isLinksActive ? "true" : "false"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 10px",
+              borderRadius: 8,
+              textDecoration: "none",
+              color: "inherit",
+              fontSize: 13.5,
+            }}
+          >
+            <span className="ico">
+              <Icon.Link size={16} />
+            </span>
+            Links
+          </Link>
+          <button type="button">
+            <span className="ico">
+              <Icon.Chart size={16} />
+            </span>
+            Analytics
+          </button>
+          <button type="button">
+            <span className="ico">
+              <Icon.Paint size={16} />
+            </span>
+            Appearance
+          </button>
+          <Link
+            href="/dashboard/nfc"
+            aria-current={isNfcActive ? "true" : "false"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 10px",
+              borderRadius: 8,
+              textDecoration: "none",
+              color: "inherit",
+              fontSize: 13.5,
+            }}
+          >
+            <span className="ico">
+              <Icon.NFC size={16} />
+            </span>
+            NFC Devices
+            <span className="count">2</span>
+          </Link>
+          <Link
+            href="/dashboard/profile"
+            aria-current={isProfileActive ? "true" : "false"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 10px",
+              borderRadius: 8,
+              textDecoration: "none",
+              color: "inherit",
+              fontSize: 13.5,
+            }}
+          >
+            <span className="ico">
+              <Icon.Gear size={16} />
+            </span>
+            Settings
+          </Link>
+        </nav>
+
+        <div className="dash-side__upgrade">
+          <div className="eyebrow mono">UPGRADE</div>
+          <div className="t">Go Pro for analytics</div>
+          <div className="d">14-day free trial. Cancel anytime.</div>
+          <button type="button" className="btn btn-gradient">
+            Try Pro
+          </button>
         </div>
-      </div>
+      </aside>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main
+        style={{
+          display: "contents",
+        }}
+      >
         {children}
+        <div
+          style={{
+            position: "fixed",
+            top: 12,
+            right: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            zIndex: 10,
+          }}
+        >
+          <span
+            className="mono"
+            style={{ fontSize: 12, color: "var(--text-3)" }}
+          >
+            {email}
+          </span>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            style={{ fontSize: 12, padding: "6px 10px" }}
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            Sign out
+          </button>
+        </div>
       </main>
     </div>
   );
