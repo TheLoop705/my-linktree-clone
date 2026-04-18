@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/db/prisma";
 import Link from "next/link";
+import { prisma } from "@/lib/db/prisma";
+import { Icon } from "@/components/design/Icon";
 
 interface PageProps {
   params: {
@@ -36,6 +37,15 @@ async function getPageData(slug: string) {
   }
 }
 
+type ThemeName = "default" | "dark" | "gradient" | "minimal";
+
+function resolveThemeName(raw?: string | null): ThemeName {
+  if (raw === "dark" || raw === "gradient" || raw === "minimal") {
+    return raw;
+  }
+  return "default";
+}
+
 export default async function PublicPage({ params }: PageProps) {
   const { slug } = params;
   const pageData = await getPageData(slug);
@@ -47,171 +57,89 @@ export default async function PublicPage({ params }: PageProps) {
   const { title, description, links, user, theme } = pageData;
   const profile = user.profile;
 
-  const getThemeStyles = (themeName?: string) => {
-    switch (themeName) {
-      case "dark":
-        return {
-          bg: "background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);",
-          textClass: "text-white",
-          cardBg: "background: rgba(255,255,255,0.08); backdrop-filter: blur(10px);",
-          cardBorder: "border: 1px solid rgba(255,255,255,0.1);",
-          accentColor: "#a855f7",
-          mutedClass: "opacity-75",
-        };
-      case "gradient":
-        return {
-          bg: "background: linear-gradient(135deg, #ec4899 0%, #f97316 50%, #eab308 100%);",
-          textClass: "text-white",
-          cardBg: "background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);",
-          cardBorder: "border: 1px solid rgba(255,255,255,0.2);",
-          accentColor: "#ffffff",
-          mutedClass: "opacity-75",
-        };
-      case "minimal":
-        return {
-          bg: "background: #f8f9fa;",
-          textClass: "text-dark",
-          cardBg: "background: #ffffff;",
-          cardBorder: "border: 1px solid #e5e7eb;",
-          accentColor: "#111827",
-          mutedClass: "text-muted",
-        };
-      default:
-        return {
-          bg: "background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #c7d2fe 100%);",
-          textClass: "text-dark",
-          cardBg: "background: #ffffff;",
-          cardBorder: "border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06);",
-          accentColor: "#6366f1",
-          mutedClass: "text-muted",
-        };
-    }
-  };
+  const themeName = resolveThemeName(theme?.themeName);
 
-  const themeStyles = getThemeStyles(theme?.themeName || undefined);
+  const displayName = title || profile?.displayName || user.email;
+  const initial = (displayName || "?").trim().charAt(0).toUpperCase();
 
   return (
-    <div
-      className={`public-page-container ${themeStyles.textClass}`}
-      style={{ cssText: themeStyles.bg } as React.CSSProperties}
-    >
-      <div className="container" style={{ maxWidth: "480px" }}>
-        {/* Profile Section */}
-        <div className="text-center mb-4">
+    <div className="profile" data-theme={themeName}>
+      {themeName === "dark" && (
+        <div className="profile__blobs" aria-hidden>
+          <span className="blob blob--pink" />
+          <span className="blob blob--indigo" />
+          <span className="blob blob--cyan" />
+        </div>
+      )}
+
+      <div className="profile__inner">
+        <div className="profile__avatar">
           {profile?.profileImageUrl ? (
-            <img
-              src={profile.profileImageUrl}
-              alt={profile?.displayName || user.email}
-              className="profile-avatar mb-3"
-            />
+            <img src={profile.profileImageUrl} alt="" />
           ) : (
-            <div
-              className="avatar-placeholder mx-auto mb-3"
-              style={{ backgroundColor: themeStyles.accentColor }}
-            >
-              <i className="bi bi-person-fill"></i>
-            </div>
+            <span>{initial}</span>
           )}
+        </div>
 
-          <h2 className="fw-bold mb-1">
-            {title || profile?.displayName || user.email}
-          </h2>
-
-          {(description || profile?.bio) && (
-            <p className={`mb-2 ${themeStyles.mutedClass}`} style={{ maxWidth: "360px", margin: "0 auto" }}>
-              {description || profile?.bio}
-            </p>
-          )}
-
+        <div className="profile__meta">
+          <div className="name">{displayName}</div>
           {profile?.profession && (
-            <p className={`small mb-1 ${themeStyles.mutedClass}`}>
-              <i className="bi bi-briefcase me-1"></i>
-              {profile.profession}
-            </p>
+            <div className="role">{profile.profession}</div>
           )}
-
           {profile?.location && (
-            <p className={`small mb-0 ${themeStyles.mutedClass}`}>
-              <i className="bi bi-geo-alt me-1"></i>
-              {profile.location}
-            </p>
-          )}
-        </div>
-
-        {/* Links Section */}
-        <div className="d-flex flex-column gap-3 mt-4">
-          {links.length > 0 ? (
-            links.map((link) => (
-              <div
-                key={link.id}
-                className="public-link-card rounded-3"
-                style={{ cssText: `${themeStyles.cardBg} ${themeStyles.cardBorder}` } as React.CSSProperties}
-              >
-                <Link
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="d-block p-3 text-decoration-none"
-                  style={{ color: "inherit" }}
-                >
-                  <div className="d-flex align-items-center justify-content-between">
-                    <div className="flex-grow-1">
-                      <h6 className="fw-semibold mb-0 fs-6">{link.title}</h6>
-                      {link.description && (
-                        <small className={themeStyles.mutedClass}>
-                          {link.description}
-                        </small>
-                      )}
-                    </div>
-                    <i className={`bi bi-arrow-up-right ${themeStyles.mutedClass}`}></i>
-                  </div>
-                </Link>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-5">
-              <i className={`bi bi-link-45deg display-4 ${themeStyles.mutedClass}`}></i>
-              <p className={`mt-2 ${themeStyles.mutedClass}`}>
-                No links available yet
-              </p>
-              <p className={`small ${themeStyles.mutedClass}`}>
-                Check back later for updates!
-              </p>
+            <div className="loc">
+              <Icon.Pin size={12} /> {profile.location}
             </div>
           )}
+          {(description || profile?.bio) && (
+            <p className="bio">{description || profile?.bio}</p>
+          )}
         </div>
 
-        {/* Website Link */}
-        {profile?.websiteUrl && (
-          <div className="mt-4 text-center">
+        <div className="profile__links">
+          {links.map((l) => (
             <Link
-              href={profile.websiteUrl}
+              key={l.id}
+              href={l.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-sm btn-outline-light rounded-pill px-4"
+              className="link-card"
+            >
+              <div
+                className="link-card__emoji"
+                style={{
+                  background: "var(--indigo-100)",
+                  color: "var(--indigo-600)",
+                }}
+              >
+                <Icon.Link size={16} />
+              </div>
+              <div className="link-card__body">
+                <div className="t">{l.title}</div>
+                {l.description && <div className="s">{l.description}</div>}
+              </div>
+              <div className="link-card__arrow">
+                <Icon.Arrow size={14} />
+              </div>
+            </Link>
+          ))}
+          {links.length === 0 && (
+            <div
               style={{
-                borderColor: themeStyles.accentColor,
-                color: themeStyles.accentColor,
+                textAlign: "center",
+                padding: "32px 0",
+                opacity: 0.7,
+                fontSize: 13,
               }}
             >
-              <i className="bi bi-globe me-1"></i>
-              Visit Website
-            </Link>
-          </div>
-        )}
+              No links yet — check back soon.
+            </div>
+          )}
+        </div>
 
-        {/* Footer */}
-        <div className="mt-5 text-center">
-          <p className={`small ${themeStyles.mutedClass}`}>
-            Powered by{" "}
-            <Link
-              href="/"
-              className="fw-semibold text-decoration-none"
-              style={{ color: themeStyles.accentColor }}
-            >
-              LinkHub
-            </Link>
-          </p>
+        <div className="profile__footer">
+          <span className="mark" aria-hidden />
+          Powered by <strong>LinkHub</strong>
         </div>
       </div>
     </div>

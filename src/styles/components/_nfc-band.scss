@@ -1,0 +1,123 @@
+// ============================================================================
+// NFC wristband — abstract rounded band with gradient chip dot.
+// Usage: <div class="nfc-band" style="--size: 260px;" data-floating>
+//          <div class="nfc-band__shine"></div>
+//          <div class="nfc-band__chip">[icon]</div>
+//          <div class="nfc-band__stitch"></div>
+//        </div>
+// ============================================================================
+
+.nfc-band {
+  --size: 320px;
+  width: var(--size);
+  height: calc(var(--size) * 0.42);
+  position: relative;
+
+  &[data-floating="true"] {
+    animation: float 5s ease-in-out infinite;
+  }
+
+  &__glow {
+    position: absolute;
+    inset: -40px;
+    background: radial-gradient(closest-side, rgba(236, 72, 153, 0.25), transparent 70%);
+    filter: blur(20px);
+    pointer-events: none;
+  }
+
+  &__body {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #1a1a24 0%, #2d2d3d 100%);
+    box-shadow:
+      0 20px 50px -15px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+  }
+
+  &__shine {
+    position: absolute;
+    top: 15%;
+    left: -20%;
+    right: -20%;
+    height: 30%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), transparent);
+    border-radius: 999px;
+  }
+
+  &__chip {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(var(--size) * 0.22);
+    height: calc(var(--size) * 0.22);
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    box-shadow:
+      0 0 30px rgba(236, 72, 153, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+  }
+
+  &__stitch {
+    position: absolute;
+    inset: 8%;
+    border-radius: 999px;
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+  }
+}
+
+// Tiny inline NFC "waves" mark (currently unused inline but kept for parity)
+.nfc-wave {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &::before {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::after {
+    width: 22px;
+    height: 22px;
+    opacity: 0.5;
+  }
+}
+
+// Pulse-ring indicator used around the tap illustration
+.pulse-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #ec4899;
+  animation: pulse-ring 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+
+  &--indigo {
+    border-color: #6366f1;
+    animation-delay: 0.5s;
+  }
+}

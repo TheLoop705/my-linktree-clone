@@ -1,9 +1,11 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import { Logo } from "@/components/design/Logo";
+import { Icon } from "@/components/design/Icon";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,6 +14,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (status === "loading") return;
@@ -22,93 +25,163 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (status === "loading" || !session) {
     return (
-      <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="spinner-border spinner-linkhub" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--bg)",
+          color: "var(--text-2)",
+          fontSize: 14,
+        }}
+      >
+        Loading…
       </div>
     );
   }
 
+  const email = session.user?.email ?? "";
+  const initial = (email[0] ?? "U").toUpperCase();
+  const slug = email ? email.split("@")[0] : "you";
+
+  const isLinksActive = pathname === "/dashboard";
+  const isProfileActive = pathname === "/dashboard/profile";
+  const isNfcActive = pathname === "/dashboard/nfc";
+
   return (
-    <div className="dashboard-body">
-      {/* Dashboard Navbar */}
-      <nav className="navbar navbar-expand-lg dashboard-navbar sticky-top py-2">
-        <div className="container-fluid px-3 px-lg-5">
-          <Link
-            href="/"
-            className="navbar-brand d-flex align-items-center text-decoration-none"
-          >
-            <i
-              className="bi bi-link-45deg fs-3 me-2"
-              style={{ color: "var(--lh-primary)" }}
-            ></i>
-            <span className="fw-bold fs-5" style={{ color: "var(--lh-dark)" }}>
-              LinkHub
-            </span>
-          </Link>
+    <div className="dash" data-dash-theme="light">
+      <aside className="dash-side">
+        <div className="dash-side__brand">
+          <Logo size={24} />
+        </div>
 
-          <button
-            className="navbar-toggler border-0"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#dashboardNav"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <div className="collapse navbar-collapse" id="dashboardNav">
-            <ul className="navbar-nav me-auto ms-4">
-              <li className="nav-item">
-                <Link
-                  href="/dashboard"
-                  className="nav-link d-flex align-items-center fw-medium"
-                >
-                  <i className="bi bi-grid-1x2 me-2"></i>
-                  Dashboard
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  href="/dashboard/profile"
-                  className="nav-link d-flex align-items-center fw-medium"
-                >
-                  <i className="bi bi-gear me-2"></i>
-                  Settings
-                </Link>
-              </li>
-            </ul>
-
-            <div className="d-flex align-items-center gap-3">
-              <div className="d-flex align-items-center">
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center me-2"
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    background: "var(--lh-gradient)",
-                  }}
-                >
-                  <i className="bi bi-person-fill text-white small"></i>
-                </div>
-                <span className="text-muted small d-none d-md-inline">
-                  {session.user?.email}
-                </span>
-              </div>
-              <button
-                className="btn btn-outline-secondary btn-sm d-flex align-items-center"
-                onClick={() => signOut({ callbackUrl: "/" })}
-              >
-                <i className="bi bi-box-arrow-right me-1"></i>
-                Sign Out
-              </button>
+        <div className="dash-side__account">
+          <div className="box">
+            <div className="avatar">{initial}</div>
+            <div className="info">
+              <div className="name">Your Hub</div>
+              <div className="url mono">linkhub.to/{slug || "you"}</div>
             </div>
           </div>
         </div>
-      </nav>
 
-      {/* Main Content */}
-      <main className="container-fluid px-3 px-lg-5 py-4">{children}</main>
+        <nav className="dash-side__nav">
+          <Link
+            href="/dashboard"
+            aria-current={isLinksActive ? "true" : "false"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 10px",
+              borderRadius: 8,
+              textDecoration: "none",
+              color: "inherit",
+              fontSize: 13.5,
+            }}
+          >
+            <span className="ico">
+              <Icon.Link size={16} />
+            </span>
+            Links
+          </Link>
+          <button type="button">
+            <span className="ico">
+              <Icon.Chart size={16} />
+            </span>
+            Analytics
+          </button>
+          <button type="button">
+            <span className="ico">
+              <Icon.Paint size={16} />
+            </span>
+            Appearance
+          </button>
+          <Link
+            href="/dashboard/nfc"
+            aria-current={isNfcActive ? "true" : "false"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 10px",
+              borderRadius: 8,
+              textDecoration: "none",
+              color: "inherit",
+              fontSize: 13.5,
+            }}
+          >
+            <span className="ico">
+              <Icon.NFC size={16} />
+            </span>
+            NFC Devices
+            <span className="count">2</span>
+          </Link>
+          <Link
+            href="/dashboard/profile"
+            aria-current={isProfileActive ? "true" : "false"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 10px",
+              borderRadius: 8,
+              textDecoration: "none",
+              color: "inherit",
+              fontSize: 13.5,
+            }}
+          >
+            <span className="ico">
+              <Icon.Gear size={16} />
+            </span>
+            Settings
+          </Link>
+        </nav>
+
+        <div className="dash-side__upgrade">
+          <div className="eyebrow mono">UPGRADE</div>
+          <div className="t">Go Pro for analytics</div>
+          <div className="d">14-day free trial. Cancel anytime.</div>
+          <button type="button" className="btn btn-gradient">
+            Try Pro
+          </button>
+        </div>
+      </aside>
+
+      <main
+        style={{
+          display: "contents",
+        }}
+      >
+        {children}
+        <div
+          style={{
+            position: "fixed",
+            top: 12,
+            right: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            zIndex: 10,
+          }}
+        >
+          <span
+            className="mono"
+            style={{ fontSize: 12, color: "var(--text-3)" }}
+          >
+            {email}
+          </span>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            style={{ fontSize: 12, padding: "6px 10px" }}
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            Sign out
+          </button>
+        </div>
+      </main>
     </div>
   );
 }

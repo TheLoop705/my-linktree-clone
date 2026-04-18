@@ -1,0 +1,69 @@
+// ============================================================================
+// LinkHub — Design Tokens
+// Mirrors linkedtree/project/styles.css :root tokens 1-for-1.
+// ============================================================================
+
+:root {
+  // ---- brand -------------------------------------------------------------
+  --indigo: #6366f1;
+  --indigo-600: #4f46e5;
+  --indigo-100: #eef0ff;
+  --pink: #ec4899;
+  --pink-100: #fde8f2;
+  --cyan: #06b6d4;
+  --cyan-100: #e0f7fb;
+
+  // ---- neutrals (slightly cool) -----------------------------------------
+  --ink: #0b0b12;
+  --ink-2: #1a1a24;
+  --text: #13131a;
+  --text-2: #4b4b57;
+  --text-3: #7a7a88;
+  --text-4: #a7a7b4;
+  --line: #ececf2;
+  --line-2: #e3e3ea;
+  --bg: #fbfbfd;
+  --surface: #ffffff;
+  --surface-2: #f6f6f9;
+
+  // ---- gradient ---------------------------------------------------------
+  --g-hero: linear-gradient(135deg, #6366f1 0%, #ec4899 55%, #06b6d4 100%);
+  --g-soft: linear-gradient(135deg, #eef0ff 0%, #fde8f2 55%, #e0f7fb 100%);
+
+  // ---- shadows ----------------------------------------------------------
+  --shadow-sm: 0 1px 2px rgba(15, 15, 40, 0.04), 0 1px 1px rgba(15, 15, 40, 0.03);
+  --shadow-md: 0 4px 10px -2px rgba(15, 15, 40, 0.06), 0 2px 4px -1px rgba(15, 15, 40, 0.04);
+  --shadow-lg: 0 24px 60px -20px rgba(60, 50, 150, 0.25), 0 10px 24px -12px rgba(60, 50, 150, 0.15);
+  --shadow-glow: 0 20px 60px -20px rgba(99, 102, 241, 0.45), 0 10px 30px -15px rgba(236, 72, 153, 0.25);
+
+  // ---- radii ------------------------------------------------------------
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-2xl: 28px;
+
+  // ---- density ----------------------------------------------------------
+  --d-pad: 16px;
+  --d-gap: 16px;
+  --d-row: 56px;
+}
+
+[data-density="compact"] {
+  --d-pad: 10px;
+  --d-gap: 10px;
+  --d-row: 44px;
+}
+
+// Dashboard dark theme overrides (scoped under .dash when [data-dash-theme="dark"]).
+[data-dash-theme="dark"] .dash {
+  --bg: #0b0b12;
+  --surface: #14141c;
+  --surface-2: #1a1a24;
+  --text: #f3f3f7;
+  --text-2: #b3b3c0;
+  --text-3: #85859a;
+  --text-4: #5a5a6e;
+  --line: #23232e;
+  --line-2: #2a2a36;
+}

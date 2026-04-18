@@ -1,0 +1,46 @@
+// ============================================================================
+// Brand mark — gradient rounded square with inset arrow glyph
+// Usage: <span class="lh-logo" style="--size: 28px;">
+//          <span class="lh-logo__mark"></span>
+//          <span class="lh-logo__label">LinkHub</span>
+//        </span>
+// ============================================================================
+
+.lh-logo {
+  --size: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  &__mark {
+    width: var(--size);
+    height: var(--size);
+    border-radius: calc(var(--size) * 0.3);
+    background: linear-gradient(135deg, #6366f1 0%, #ec4899 55%, #06b6d4 100%);
+    position: relative;
+    box-shadow: 0 4px 14px -4px rgba(99, 102, 241, 0.5);
+    flex-shrink: 0;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: calc(var(--size) * 0.22);
+      border-radius: 3px;
+      border: 1.6px solid rgba(255, 255, 255, 0.95);
+      border-right: none;
+      border-bottom: none;
+      transform: rotate(-45deg);
+    }
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: calc(var(--size) * 0.58);
+    letter-spacing: -0.02em;
+  }
+
+  // variant for nav / prototypes that need a smaller 24px mark only
+  &--small {
+    --size: 24px;
+  }
+}

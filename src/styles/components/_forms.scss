@@ -1,0 +1,84 @@
+// ============================================================================
+// Form primitives — .input, .label
+// ============================================================================
+
+.input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  font-size: 14px;
+  color: var(--text);
+  transition: border-color 120ms, box-shadow 120ms;
+
+  &::placeholder {
+    color: var(--text-4);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  }
+
+  &:disabled {
+    background: var(--surface-2);
+    color: var(--text-3);
+    cursor: not-allowed;
+  }
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 6px;
+  letter-spacing: -0.005em;
+}
+
+.input-inline-prefix {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 120ms, box-shadow 120ms;
+
+  &:focus-within {
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  }
+
+  .prefix {
+    padding: 11px 0 11px 14px;
+    color: var(--text-3);
+    font-size: 13px;
+  }
+
+  .input {
+    border: none;
+    padding-left: 0;
+
+    &:focus {
+      border: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.field {
+  margin-bottom: 14px;
+
+  &--lg {
+    margin-bottom: 20px;
+  }
+}
+
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
